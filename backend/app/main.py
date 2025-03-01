@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-app.include_router(company_job.router, prefix="/api")
+app.include_router(company_job.router, prefix="/company")
 
 app.add_middleware(
     CORSMiddleware,
