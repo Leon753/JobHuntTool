@@ -146,10 +146,10 @@ class GPTChatCompletionClient(AzureAIClient):
             "max_tokens": max_tokens,
             "n": choices,
             "temperature": temparture,
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": task_request_schema
-            }
+            # "response_format": {
+            #     "type": "json_schema",
+            #     "json_schema": task_request_schema # need to update
+            # }
 
         }
 
