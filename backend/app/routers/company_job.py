@@ -48,6 +48,7 @@ async def get_summary_email(packet: Email_Summary_Request):
     chat_client = GPTChatCompletionClient(response_manager=response_manager, 
                                           base_url=ENDPOINT_OPENAI_GPT4, 
                                           api=OPENAI_GPT4_KEY,
+                                          api_version=CHAT_VERSION,
                                           deployment_name=CHAT_DEPLOYMENT_NAME)
     chat_response = chat_client.call(messages=messages)
     msgs = chat_client.parse_response(chat_response)
