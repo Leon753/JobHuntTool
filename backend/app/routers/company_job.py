@@ -4,8 +4,11 @@ from services.perplexity_client import PerplexityClient
 from services.openai_client import GPTChatCompletionClient, GPTCompletionClient, InMemoryResponseManager
 from dotenv import load_dotenv
 from pydantic import BaseModel
+import requests
 import os
-
+import json
+from typing import Dict, List
+import re 
 router = APIRouter()
 load_dotenv()
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
@@ -23,7 +26,8 @@ perplexity_client = PerplexityClient(
     model="sonar"
 )
 """
-client = OpenAI(api_key=PERPLEXITY_API_URL, base_url="https://api.perplexity.ai")
+print(PERPLEXITY_API_URL)
+client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai")
 
 
 
@@ -56,36 +60,76 @@ async def get_summary_email(packet: Email_Summary_Request):
         chat_client.add_memory(role = "assistant", content = i)
     return {"data": chat_client.get_history()[-1]}
 
+class ColumnResult(BaseModel):
+    status: str
+    content: str
+    source: List[str]
+
+class JobInformation(BaseModel):
+    company: str
+    results: Dict[str, ColumnResult]
 
 @router.get("/company-job-info")
 async def get_company_job_info(company: str, job_position: str):
     # Build the query for the Perplexity API
-    query = f"Provide summary about {company} and the job position {job_position} by searching, LinkedIn, \
-                Company Career Site, and Indeed for job information. Then searching through LevelsFYI for information \
-                about Salary range if the information exists. Also I want to include good problems to do from \
-                LeetCode if they exist. Could you also look at GlassDoor and similar sites for information about \
-                the interiew process"
+    query = f"""Provide summary about {company} and the job position {job_position} by searching LinkedIn, the Company Career Site, and Indeed for job information. Then search through LevelsFYI for details on the salary range, and review GlassDoor and similar sites for insights on the interview process.
+
+    Output a JSON object in the following format:
+        {{
+        "company": "{company}",
+        "results": {{
+            "job_description": {{
+                "status": "<Validated|Needs Work|Incorrect>",
+                "content": "<Provide a concise summary of the job posting>",
+                "source": ["<url1>", "<url2>", ...]
+            }},
+            "pay_range": {{
+                "status": "<Validated|Needs Work|Incorrect>",
+                "content": "<Provide details on the salary range>",
+                "source": ["<url1>", "<url2>", ...]
+            }}
+        }}
+        }}
+    Only output the JSON object.    NO MARK DOWN"""
+
+    
 
     messages = [
-    {
-        "role": "system",
-        "content": (
-            "Give a consice but informative answer"
-        ),
-    },
-    {   
-        "role": "user",
-        "content": (
-            query
-        ),
-    },
-]
-    
-    response = client.chat.completions.create(
-        model="sonar",
-        messages=messages,
-    )
-    if response is None:
-        raise HTTPException(status_code=500, detail="Error fetching data from Perplexity API")
-    
-    return {"data": response}
+        {
+            "role": "system",
+            "content": (
+                "Give a consice but informative answer"
+            ),
+        },
+        {   
+            "role": "user",
+            "content": (
+                query
+            ),
+        },
+    ]       
+    response_format = {
+		    "type": "json_schema",
+        "json_schema": {"schema": JobInformation.model_json_schema()}
+    }
+    prelixty_client = PerplexityClient(api_key=PERPLEXITY_API_KEY, api_url="https://api.perplexity.ai/chat/completions", model="sonar")
+    response = await prelixty_client.get_response(messages=messages, response_format=response_format)
+    print(type(response))
+    print(("Raw response from API: %r", response))
+    cleaned = re.sub(r"^```json\s*", "", response)
+    cleaned = re.sub(r"\s*```$", "", cleaned)
+    try:
+        response = json.loads(cleaned)
+    except Exception as e:
+        print("ERROR RESPONSE", e)
+        # You can choose to raise an HTTPException or return an error response
+        raise HTTPException(status_code=500, detail="Response validation failed")
+
+    try:
+        response_format = JobInformation(**response)
+    except Exception as e:
+        print("ERROR RESPONSE", e)
+        # You can choose to raise an HTTPException or return an error response
+        raise HTTPException(status_code=500, detail="Response validation failed")
+
+    return {"data": response_format}

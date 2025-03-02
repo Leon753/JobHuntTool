@@ -140,7 +140,7 @@ class GPTChatCompletionClient(AzureAIClient):
         self.uri = f"{self.base_url}/openai/deployments/{self.deployment_name}/chat/completions?api-version={self.api_version}"
        
         
-    def prepare_payload(self, messages:List[Dict[str,str]], max_tokens:int = 300, choices:int = 1, temparture:float = 0.7):
+    def prepare_payload(self, messages:List[Dict[str,str]],json_schema:Dict = None, max_tokens:int = 300, choices:int = 1, temparture:float = 0.7, ):
         return {
             "messages": messages,
             "max_tokens": max_tokens,
@@ -148,7 +148,7 @@ class GPTChatCompletionClient(AzureAIClient):
             "temperature": temparture,
             # "response_format": {
             #     "type": "json_schema",
-            #     "json_schema": task_request_schema # need to update
+            #     "json_schema": json_schema # need to update
             # }
 
         }
