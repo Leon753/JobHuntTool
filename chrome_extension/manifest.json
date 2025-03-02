@@ -6,7 +6,8 @@
     "side_panel": {
         "default_path": "js/index.html"
     },
-    "permissions": ["sidePanel", "activeTab", "storage"],
+    "permissions": ["sidePanel", "activeTab", "storage", "identity", "identity.email"],
+    "host_permissions": ["https://www.googleapis.com/"],
     "background": {
         "service_worker": "js/background.js"
     },
@@ -18,7 +19,7 @@
         "default_title": "Job Hunter"
     },
     "oauth2": {
-        "client_id": "<google_client_id>",
-        "scopes": ["https://www.googleapis.com/auth/gmail.readonly"]
+        "client_id": "",
+        "scopes": ["https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/userinfo.email"]
     }
 }
