@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* .App {
+  color: black;
+  text-align: center;
+} */
+
+.container {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  font-family: Tahoma, sans-serif;
+}
