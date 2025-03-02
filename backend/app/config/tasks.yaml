@@ -1,0 +1,39 @@
+research_task:
+  description: >
+    Conduct thorough research on {company} and the {job} role.
+    Collect detailed information including:
+    - Company Overview and Name
+    - Company Mission and Vision (including strategic goals)
+    - Market Position and Financial Metrics
+    - Job Title and Key Responsibilities
+    - Required Skills for the {job} role
+    - Interview Experiences and sample technical questions (e.g., LeetCode questions)
+    Use up-to-date sources to extract 10 key bullet points.
+  expected_output: >
+    A list of 10 bullet points summarizing key findings about {company} and the {job} role,
+    covering aspects such as Company Name, Company Mission and Vision,
+    Job Title, Key Responsibilities, Required Skills, Interview Experiences, and Example LeetCode Questions.
+  agent: researcher
+
+reporting_task:
+  description: >
+    Review the research context and compile a detailed report.
+    Transform the gathered information into a structured table with columns for:
+      - Company Name
+      - Company Mission and Vision (and strategic goals)
+      - Job Title
+      - Key Responsibilities
+      - Required Skills
+      - Interview Experiences
+      - LeetCode Questions
+  expected_output: >
+    A JSON object conforming to a schema that includes the following fields:
+      - company_name
+      - company_mission_and_vision
+      - job_title
+      - key_responsibilities
+      - required_skills
+      - interview_experiences
+      - leetcode_questions
+  agent: reporting_analyst
+  output_file: report.md
