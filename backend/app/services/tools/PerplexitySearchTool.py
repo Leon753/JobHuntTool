@@ -2,15 +2,18 @@ from crewai.tools.base_tool import BaseTool
 from services.perplexity_client import PerplexityClient
 from dotenv import load_dotenv
 import os
+import asyncio
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
 PERPLEXITY_API_URL = os.getenv("PERPLEXITY_API_URL")
+
 class PerplexitySearchTool(BaseTool):
     name: str = "Perplexity Search Tool"
-    description: str = "A tool to perform conversational search queries using Perplexity-like behavior."
+    description: str = "A tool to perform conversational search queries using Perplexity-like behavior. The goal of this tool is to search the web"
 
-    async def _run(self, query: str) -> str:
+    def _run(self, query: str) -> str:
+    
+
         # Example endpoint; replace with the actual Perplexity API endpoint if available.
-        endpoint = "https://api.perplexity.ai/search"
         headers = {
             "Authorization": "Bearer YOUR_PERPLEXITY_API_KEY",
             "Content-Type": "application/json"
@@ -30,6 +33,8 @@ class PerplexitySearchTool(BaseTool):
                 ),
             },
         ] 
-        client  = PerplexityClient(api_key=PERPLEXITY_API_KEY, api_url=PERPLEXITY_API_URL, model="sonar")
-        response = await client.get_response(messages=messages)
-        return response
+        prelixty_client = PerplexityClient(api_key=PERPLEXITY_API_KEY, 
+                                       api_url="https://api.perplexity.ai/chat/completions", 
+                                       model="sonar")
+        result = prelixty_client.get_response_sync(messages=messages)
+        return result

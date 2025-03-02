@@ -26,7 +26,6 @@ LLM = {
         "base_url": f"{ENDPOINT_OPENAI_GPT4}/openai/deployments/{CHAT_DEPLOYMENT_NAME}/chat/completions?api-version={CHAT_VERSION}",
     }
 
-print(OPENAI_GPT4_KEY)
 config=dict(
         llm=dict(
         provider="azure_openai",
@@ -60,9 +59,9 @@ config = dict(
 )
 # Define the input dictionary with the required keys
 input_string = "Circle Internet Financial mission vision strategic goals, website: https://www.circle.com"
-search_tool = WebsiteSearchTool(config=config)
+search_tool = PerplexitySearchTool()
 current_dir = os.path.dirname(os.path.abspath(__file__))
-
+result = search_tool._run(input_string)
 
 # Load YAML Configuration
 def load_config(file:str):
@@ -75,10 +74,6 @@ def load_config(file:str):
 
 agents_config = load_config("agents.yaml")
 tasks_config = load_config("tasks.yaml")
-
-print(agents_config['researcher'])
-print(tasks_config['research_task'].get('config', {}))
-print(tasks_config['reporting_task'].get('config', {}))
 
 @CrewBase
 class LatestAiDevelopmentCrew():
