@@ -139,7 +139,9 @@ async def get_company_job_info(company: str, job_position: str):
 		    "type": "json_schema",
         "json_schema": {"schema": JobInformation.model_json_schema()}
     }
-    prelixty_client = PerplexityClient(api_key=PERPLEXITY_API_KEY, api_url="https://api.perplexity.ai/chat/completions", model="sonar")
+    prelixty_client = PerplexityClient(api_key=PERPLEXITY_API_KEY, 
+                                       api_url="https://api.perplexity.ai/chat/completions", 
+                                       model="sonar")
     response = await prelixty_client.get_response(messages=messages, response_format=response_format)
     print(type(response))
     print(("Raw response from API: %r", response))
@@ -149,14 +151,12 @@ async def get_company_job_info(company: str, job_position: str):
         response = json.loads(cleaned)
     except Exception as e:
         print("ERROR RESPONSE", e)
-        # You can choose to raise an HTTPException or return an error response
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     try:
         response_format = JobInformation(**response)
     except Exception as e:
         print("ERROR RESPONSE", e)
-        # You can choose to raise an HTTPException or return an error response
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     return {"data": response_format}
