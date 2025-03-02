@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from openai import OpenAI
 from services.perplexity_client import PerplexityClient 
 from services.openai_client import GPTChatCompletionClient, GPTCompletionClient, InMemoryResponseManager
+from services.crew_client import LatestAiDevelopmentCrew
 from dotenv import load_dotenv
 from pydantic import BaseModel
 import requests
@@ -13,8 +14,8 @@ router = APIRouter()
 load_dotenv()
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
 PERPLEXITY_API_URL = os.getenv("PERPLEXITY_API_URL")
-OPENAI_GPT4_KEY = os.getenv("AZURE_OPENAI_KEY_GPT_4")
-ENDPOINT_OPENAI_GPT4 = os.getenv("GPT4_ENDPOINT")
+OPENAI_GPT4_KEY = os.getenv("AZURE_API_KEY")
+ENDPOINT_OPENAI_GPT4 = os.getenv("AZURE_API_BASE")
 
 CHAT_VERSION = "2024-08-01-preview"  # Update if needed
 CHAT_DEPLOYMENT_NAME = "gpt-4o"  # Replace with your deployed model name
@@ -143,3 +144,12 @@ async def get_company_job_info(company: str, job_position: str):
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     return {"data": response_format}
+
+
+@router.get("/company-job-info-crew-ai")
+async def get_company_job_info(company: str, job_position: str):
+    inputs = {
+        'company': company,
+        'job': job_position
+    }
+    LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)   

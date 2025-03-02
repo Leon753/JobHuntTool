@@ -13,7 +13,7 @@ class PerplexityClient:
         self.api_url = api_url
         self.model = model
 
-    async def get_response(self, messages:list, response_format: dict, timeout: int = 120) -> str:
+    async def get_response(self, messages:list, response_format: dict=None, timeout: int = 120) -> str:
         """
         Async function to get response from Perplexity API.
         Uses aiohttp for non-blocking API calls.
