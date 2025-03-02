@@ -1,11 +1,12 @@
 import asyncio
 import aiohttp
 import json
-import time
 import logging
-import threading
+import certifi
+import ssl
 
 logger = logging.getLogger(__name__)
+ssl_context = ssl.create_default_context(cafile=certifi.where())
 
 class PerplexityClient:
     def __init__(self, api_key: str, api_url: str, model: str):
@@ -32,7 +33,7 @@ class PerplexityClient:
             logger.debug("Request payload: %s", json.dumps(payload, indent=2))
      
         try:
-            async with aiohttp.request("POST", self.api_url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(timeout)) as response:
+            async with aiohttp.request("POST", self.api_url, ssl=ssl_context, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(timeout)) as response:
                 response.raise_for_status()
                 json_response = await response.json()
                 return json_response["choices"][0]["message"]["content"]

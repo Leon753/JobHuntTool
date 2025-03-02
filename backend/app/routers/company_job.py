@@ -9,8 +9,10 @@ import os
 import json
 from typing import Dict, List
 import re 
+
 router = APIRouter()
 load_dotenv()
+
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
 PERPLEXITY_API_URL = os.getenv("PERPLEXITY_API_URL")
 OPENAI_GPT4_KEY = os.getenv("AZURE_API_KEY")
@@ -26,10 +28,8 @@ perplexity_client = PerplexityClient(
     model="sonar"
 )
 """
-print(PERPLEXITY_API_URL)
-client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai")
 
-print()
+client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai")
 
 
 @router.get("/email-summary")
@@ -70,35 +70,52 @@ class JobInformation(BaseModel):
 @router.get("/company-job-info")
 async def get_company_job_info(company: str, job_position: str):
     # Build the query for the Perplexity API
-    query = f"""Provide summary about {company} and the job position {job_position} by searching LinkedIn, the Company Career Site, and Indeed for job information. Then search through LevelsFYI for details on the salary range, and review GlassDoor and similar sites for insights on the interview process.
+    query = f"""
+        Task:
+            - Provide a comprehensive summary about {company} and the job position {job_position}. Gather the following information:
+            1. **Job Description:**
+                - Search LinkedIn, the Company Career Site, Indeed, and Glassdoor for the job posting details.
+            2. **Salary/Pay Range:**
+                - Search http://levels.fyi/ for details on the salary range for {job_position} at {company}.
+            3. **Interview Process:**
+                - Gather insights from interview process reviews.
+                - Identify whether the technical interviews are more focused on algorithms or data structures.
+                - Explicity specify the range of total number of rounds, breaking them down into behavioral and technical rounds.
+                - Include the typical overall duration of the interview process.
+            4. **Interview Experience:**
+                - Find an example of an interview experience for {job_position} at {company}.
+            5. **Recommended Preparation:**
+                - Search Reddit and Leetcode for recommended Leetcode problems for {company}.
 
-    Output a JSON object in the following format:
-        {{
-        "company": "{company}",
-        "results": {{
-            "job_description": {{
-                "status": "<Validated|Needs Work|Incorrect>",
-                "content": "<Provide a concise summary of the job posting>",
-                "source": ["<url1>", "<url2>", ...]
-            }},
-            "pay_range": {{
-                "status": "<Validated|Needs Work|Incorrect>",
-                "content": "<Provide details on the salary range>",
-                "source": ["<url1>", "<url2>", ...]
-            }},
-            "leetcode": {{ #provide common leetcode questions for the position
-                "status": "<Validated|Needs Work|Incorrect>",
-                "content": "<Provide details on the salary range>",
-                "source": ["<url1>", "<url2>", ...]
-            }},
-            "behavioral": {{ #provide common behavioral questions for the position
-                "status": "<Validated|Needs Work|Incorrect>",
-                "content": "<Provide details on the salary range>",
-                "source": ["<url1>", "<url2>", ...]
+            Output Requirements:
+            - Output a JSON object in the following format, and do not include any additional text or markdown:
+
+            {{
+                "company": "{company}",
+                "results": {{
+                    "job_description": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "<Concise summary of the job posting>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "pay_range": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "<Details on the salary range>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "interview_process": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "<Details on the interview process, including round counts (behavioral and technical) and overall duration>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "example_interview_experience": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "<Example of an interview experience>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }}
+                }}
             }}
-        }}
-        }}
-    Only output the JSON object.    NO MARK DOWN"""
+    """
 
     
 
