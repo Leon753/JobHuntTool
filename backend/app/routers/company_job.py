@@ -15,8 +15,8 @@ load_dotenv()
 
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
 PERPLEXITY_API_URL = os.getenv("PERPLEXITY_API_URL")
-OPENAI_GPT4_KEY = os.getenv("AZURE_OPENAI_KEY_GPT_4")
-ENDPOINT_OPENAI_GPT4 = os.getenv("GPT4_ENDPOINT")
+OPENAI_GPT4_KEY = os.getenv("AZURE_API_KEY")
+ENDPOINT_OPENAI_GPT4 = os.getenv("AZURE_API_BASE")
 
 CHAT_VERSION = "2024-08-01-preview"  # Update if needed
 CHAT_DEPLOYMENT_NAME = "gpt-4o"  # Replace with your deployed model name
@@ -28,14 +28,12 @@ perplexity_client = PerplexityClient(
     model="sonar"
 )
 """
-print(PERPLEXITY_API_URL)
+
 client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai")
 
-class Email_Summary_Request(BaseModel):
-    content: str
 
-@router.post("/email-summary")
-async def get_summary_email(packet: Email_Summary_Request):
+@router.get("/email-summary")
+async def get_summary_email(email: str):
     messages = [
             {
                 "role": "system", 
@@ -43,7 +41,7 @@ async def get_summary_email(packet: Email_Summary_Request):
             },
             {
                 "role": "user", 
-                "content": f"The email content is provided here: {packet.content}"
+                "content": f"The email content is provided here: {email}"
             }
         ]
     response_manager = InMemoryResponseManager()
