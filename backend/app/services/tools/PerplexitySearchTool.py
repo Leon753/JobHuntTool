@@ -1,10 +1,6 @@
 from crewai.tools.base_tool import BaseTool
 from services.perplexity_client import PerplexityClient
-from dotenv import load_dotenv
-import os
-import asyncio
-PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
-PERPLEXITY_API_URL = os.getenv("PERPLEXITY_API_URL")
+from config.keys import PERPLEXITY_API_KEY
 
 class PerplexitySearchTool(BaseTool):
     name: str = "Perplexity Search Tool"
