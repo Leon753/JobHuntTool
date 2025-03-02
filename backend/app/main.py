@@ -1,10 +1,18 @@
 from fastapi import FastAPI
-from routers import company_job
+from contextlib import asynccontextmanager
+from db.database import init_db
+from routers import company_job, user_info
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(company_job.router, prefix="/company")
+app.include_router(user_info.router, prefix="/user")
 
 app.add_middleware(
     CORSMiddleware,
