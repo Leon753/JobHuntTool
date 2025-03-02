@@ -15,8 +15,6 @@ def string_to_json(response):
     cleaned = re.sub(r"\s*```$", "", cleaned)
     return cleaned
 
-client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai")
-
 
 @router.get("/email-summary")
 async def get_summary_email(email: str):
@@ -95,9 +93,6 @@ async def get_company_job_info(company: str, job_position: str):
                 }}
             }}
     """
-
-    
-
     messages = [
         {
             "role": "system",
