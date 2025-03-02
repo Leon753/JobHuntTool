@@ -1,9 +1,8 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
 from langchain_community.tools import DuckDuckGoSearchRun
-from crewai_tools import (WebsiteSearchTool, FileReadTool)
 from services.tools.PerplexitySearchTool import PerplexitySearchTool
-
+from models.create_table import JobInformation
 from dotenv import load_dotenv
 import os
 import yaml
@@ -57,11 +56,10 @@ config = dict(
         ),
     )
 )
-# Define the input dictionary with the required keys
-input_string = "Circle Internet Financial mission vision strategic goals, website: https://www.circle.com"
+
+
 search_tool = PerplexitySearchTool()
 current_dir = os.path.dirname(os.path.abspath(__file__))
-result = search_tool._run(input_string)
 
 # Load YAML Configuration
 def load_config(file:str):
@@ -116,6 +114,7 @@ class LatestAiDevelopmentCrew():
         description=tasks_config['reporting_task']['description'],
         expected_output=tasks_config['reporting_task']['expected_output'],
         agent=self.reporting_analyst(),
+        output_json=JobInformation,
         output_file='output/report.md' # This is the file that will be contain the final report.
         )
     @crew
