@@ -1,35 +1,19 @@
 from fastapi import APIRouter, HTTPException
 from openai import OpenAI
 from services.perplexity_client import PerplexityClient 
-from services.openai_client import GPTChatCompletionClient, GPTCompletionClient, InMemoryResponseManager
-from dotenv import load_dotenv
-from pydantic import BaseModel
-import requests
-import os
+from services.openai_client import GPTChatCompletionClient, InMemoryResponseManager
+from services.crew_client import LatestAiDevelopmentCrew
+from config.keys import PERPLEXITY_API_KEY, OPENAI_GPT4_KEY, ENDPOINT_OPENAI_GPT4, CHAT_VERSION, CHAT_DEPLOYMENT_NAME
 import json
-from typing import Dict, List
 import re 
+from models.create_table import JobInformation
 
 router = APIRouter()
-load_dotenv()
 
-PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
-PERPLEXITY_API_URL = os.getenv("PERPLEXITY_API_URL")
-OPENAI_GPT4_KEY = os.getenv("AZURE_API_KEY")
-ENDPOINT_OPENAI_GPT4 = os.getenv("AZURE_API_BASE")
-
-CHAT_VERSION = "2024-08-01-preview"  # Update if needed
-CHAT_DEPLOYMENT_NAME = "gpt-4o"  # Replace with your deployed model name
-
-"""
-perplexity_client = PerplexityClient(
-    api_key=PERPLEXITY_API_KEY,
-    api_url=PERPLEXITY_API_URL,
-    model="sonar"
-)
-"""
-
-client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai")
+def string_to_json(response):
+    cleaned = re.sub(r"^```json\s*", "", response)
+    cleaned = re.sub(r"\s*```$", "", cleaned)
+    return cleaned
 
 
 @router.get("/email-summary")
@@ -58,14 +42,7 @@ async def get_summary_email(email: str):
         chat_client.add_memory(role = "assistant", content = i)
     return {"data": chat_client.get_history()[-1]}
 
-class ColumnResult(BaseModel):
-    status: str
-    content: str
-    source: List[str]
 
-class JobInformation(BaseModel):
-    company: str
-    results: Dict[str, ColumnResult]
 
 @router.get("/company-job-info")
 async def get_company_job_info(company: str, job_position: str):
@@ -116,9 +93,6 @@ async def get_company_job_info(company: str, job_position: str):
                 }}
             }}
     """
-
-    
-
     messages = [
         {
             "role": "system",
@@ -141,18 +115,31 @@ async def get_company_job_info(company: str, job_position: str):
                                        api_url="https://api.perplexity.ai/chat/completions", 
                                        model="sonar")
     response = await prelixty_client.get_response(messages=messages, response_format=response_format)
-    print(type(response))
-    print(("Raw response from API: %r", response))
-    cleaned = re.sub(r"^```json\s*", "", response)
-    cleaned = re.sub(r"\s*```$", "", cleaned)
+    
     try:
-        response = json.loads(cleaned)
+        response = json.loads(string_to_json(response))
     except Exception as e:
         print("ERROR RESPONSE", e)
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     try:
         response_format = JobInformation(**response)
+    except Exception as e:
+        print("ERROR RESPONSE", e)
+        raise HTTPException(status_code=500, detail="Response validation failed")
+
+    return {"data": response_format}
+
+
+@router.get("/company-job-info-crew-ai")
+async def get_company_job_info(company: str, job_position: str):
+    inputs = {
+        'company': company,
+        'job': job_position
+    }
+    result = LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)   
+    try:
+        response_format = JobInformation(**result.json_dict)
     except Exception as e:
         print("ERROR RESPONSE", e)
         raise HTTPException(status_code=500, detail="Response validation failed")
