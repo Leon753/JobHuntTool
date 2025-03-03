@@ -10,8 +10,8 @@ from config.keys import *
 
 duck_search_tool = DuckDuckGoSearchTool()
 perplexity_search_tool = PerplexitySearchTool()
-webscrapper = WebScrapperTool()
-print(webscrapper._run(urls=["https://boards.greenhouse.io/spacex/jobs/7835107002?gh_jid=7835107002"]))
+# webscrapper = WebScrapperTool()
+# print(webscrapper._run(urls=["https://boards.greenhouse.io/spacex/jobs/7835107002?gh_jid=7835107002"]))
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # Load YAML Configuration
 def load_config(file:str):
@@ -59,7 +59,7 @@ class LatestAiDevelopmentCrew():
         return Agent(
             config=agents_config['researcher'],
             verbose=True,
-            tools=[duck_search_tool,webscrapper],
+            tools=[duck_search_tool],
         )
 
     @agent
