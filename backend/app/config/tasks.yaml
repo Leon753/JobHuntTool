@@ -17,23 +17,47 @@ research_task:
 
 reporting_task:
   description: >
-    Review the research context and compile a detailed report.
-    Transform the gathered information into a structured table with columns for:
-      - Company Name
-      - Company Mission and Vision (and strategic goals)
-      - Job Title
-      - Key Responsibilities
-      - Required Skills
-      - Interview Experiences
-      - LeetCode Questions
+    - Provide a comprehensive summary about {company} and the job position {job}. Gather the following information:
+        1. **Job Description:**
+            - Search LinkedIn, the Company Career Site, Indeed, and Glassdoor for the job posting details.
+        2. **Salary/Pay Range:**
+            - Search http://levels.fyi/ for details on the salary range for {job} at {company}.
+        3. **Interview Process:**
+            - Gather insights from interview process reviews.
+            - Identify whether the technical interviews are more focused on algorithms or data structures.
+            - Explicity specify the range of total number of rounds, breaking them down into behavioral and technical rounds.
+            - Include the typical overall duration of the interview process.
+        4. **Interview Experience:**
+            - Find an example of an interview experience for {job} at {company}.
+        5. **Recommended Preparation:**
+            - Search Reddit and Leetcode for recommended Leetcode problems for {company}.
   expected_output: >
-    A JSON object conforming to a schema that includes the following fields:
-      - company_name
-      - company_mission_and_vision
-      - job_title
-      - key_responsibilities
-      - required_skills
-      - interview_experiences
-      - leetcode_questions
+    - Output a JSON object in the following format, and do not include any additional text or markdown:
+
+            {{
+                "company": "{company}",
+                "results": {{
+                    "job_description": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "MUST BE A STRING <Concise summary of the job posting>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "pay_range": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": " MUST BE A STRING <Details on the salary range>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "interview_process": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "MUST BE A STRING <Details on the interview process, including round counts (behavioral and technical) and overall duration>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "example_interview_experience": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "MUST BE A STRING <Example of an interview experience>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }}
+                }}
+            }}
   agent: reporting_analyst
   output_file: report.md

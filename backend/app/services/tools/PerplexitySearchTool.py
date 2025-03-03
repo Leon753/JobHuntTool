@@ -14,7 +14,6 @@ class PerplexitySearchTool(BaseTool):
             "Authorization": "Bearer YOUR_PERPLEXITY_API_KEY",
             "Content-Type": "application/json"
         }
-        payload = {"query": query}
         messages = [
             {
                 "role": "system",

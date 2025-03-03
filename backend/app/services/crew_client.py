@@ -1,18 +1,18 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
-from langchain_community.tools import DuckDuckGoSearchRun
-from crewai_tools import YoutubeVideoSearchTool
+from services.tools.DuckDuckGoSearchTool import DuckDuckGoSearchTool
 from services.tools.PerplexitySearchTool import PerplexitySearchTool
+from services.tools.WebScrapperTool import WebScrapperTool
 from models.create_table import JobInformation
 import os
 import yaml
 from config.keys import *
 
-
-search_tool = PerplexitySearchTool()
-
+duck_search_tool = DuckDuckGoSearchTool()
+perplexity_search_tool = PerplexitySearchTool()
+webscrapper = WebScrapperTool()
+print(webscrapper._run(urls=["https://boards.greenhouse.io/spacex/jobs/7835107002?gh_jid=7835107002"]))
 current_dir = os.path.dirname(os.path.abspath(__file__))
-
 # Load YAML Configuration
 def load_config(file:str):
     config_path = os.path.join(current_dir, "..", "config", file)
@@ -59,7 +59,7 @@ class LatestAiDevelopmentCrew():
         return Agent(
             config=agents_config['researcher'],
             verbose=True,
-            # tools=[search_tool, youtube_seh],
+            tools=[duck_search_tool,webscrapper],
         )
 
     @agent
@@ -94,12 +94,5 @@ class LatestAiDevelopmentCrew():
             agents=self.agents, # Automatically created by the @agent decorator
             tasks=self.tasks, # Automatically created by the @task decorator
             process=Process.sequential,
-            memory=True,
-            embedder={
-                "provider": "ollama",
-                "config": {
-                    "model": "nomic-embed-text"
-                }
-            },
             verbose=True,
         )
