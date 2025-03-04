@@ -1,13 +1,11 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
-from crewai.memory import LongTermMemory
-from crewai.memory.storage.ltm_sqlite_storage import LTMSQLiteStorage
-from crewai.memory.storage.rag_storage import RAGStorage
+from langchain_community.tools import DuckDuckGoSearchRun
 from services.tools.PerplexitySearchTool import PerplexitySearchTool
 from models.create_table import JobInformation
 import os
 import yaml
-from config.keys import *
+from config.keys import OPENAI_GPT4_KEY, ENDPOINT_OPENAI_GPT4, CHAT_DEPLOYMENT_NAME, CHAT_VERSION
 
 
 search_tool = PerplexitySearchTool()
@@ -40,7 +38,7 @@ class LatestAiDevelopmentCrew():
         return Agent(
             config=agents_config['researcher'],
             verbose=True,
-            #tools=[search_tool],
+            tools=[search_tool],
         )
 
     @agent
@@ -75,5 +73,5 @@ class LatestAiDevelopmentCrew():
             agents=self.agents, # Automatically created by the @agent decorator
             tasks=self.tasks, # Automatically created by the @task decorator
             process=Process.sequential,
+            verbose=True,
         )
-            
