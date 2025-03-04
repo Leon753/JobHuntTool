@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from openai import OpenAI
 from services.perplexity_client import PerplexityClient 
+from services import memo_service 
 from services.openai_client import GPTChatCompletionClient, InMemoryResponseManager
 from services.crew_client import LatestAiDevelopmentCrew
 from config.keys import PERPLEXITY_API_KEY, OPENAI_GPT4_KEY, ENDPOINT_OPENAI_GPT4, CHAT_VERSION, CHAT_DEPLOYMENT_NAME
@@ -137,11 +138,16 @@ async def get_company_job_info(company: str, job_position: str):
         'company': company,
         'job': job_position
     }
-    result = LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)   
     try:
-        response_format = JobInformation(**result.json_dict)
+        if await memo_service.query_exists(company+job_position):
+            response_format = await JobInformation(memo_service.get_response_for_query(company+job_position))
+            print("GETTING")
+        else:
+            result = LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)   
+            await memo_service.save_query_response(company+job_position, **result.json_dict)
+            print("INSERTING")
+            response_format = JobInformation(**result.json_dict)
     except Exception as e:
         print("ERROR RESPONSE", e)
         raise HTTPException(status_code=500, detail="Response validation failed")
-
     return {"data": response_format}
