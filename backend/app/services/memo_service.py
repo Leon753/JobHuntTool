@@ -12,11 +12,11 @@ async def query_exists(query: str) -> bool:
             return bool(exists)
 
 async def save_query_response(query: str, response: dict):
+    response_str = json.dumps(response)
     async with aiosqlite.connect(DATABASE) as db:
-        json_data = json.dumps(response)
         await db.execute(
             "INSERT INTO queries (query, response) VALUES (?, ?)",
-            (query, json_data)
+            (query, response_str)
         )
         await db.commit()
 

@@ -134,20 +134,28 @@ async def get_company_job_info(company: str, job_position: str):
 
 @router.get("/company-job-info-crew-ai")
 async def get_company_job_info(company: str, job_position: str):
+    query_key = company+job_position
     inputs = {
         'company': company,
         'job': job_position
     }
-    try:
-        if await memo_service.query_exists(company+job_position):
-            response_format = await JobInformation(memo_service.get_response_for_query(company+job_position))
-            print("GETTING")
-        else:
-            result = LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)   
-            await memo_service.save_query_response(company+job_position, **result.json_dict)
-            print("INSERTING")
+    if await memo_service.query_exists(query_key):
+        print("EXISTS")
+        response_dict = await memo_service.get_response_for_query(query_key)
+        try:
+            response_format = JobInformation(**response_dict)
+        except Exception as e:
+            print("ERROR RESPONSE", e)
+            raise HTTPException(status_code=500, detail="Response validation failed")
+    else:
+        result = LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)   
+        await memo_service.save_query_response(query_key, result.json_dict)
+        print("INSERTING")
+
+        try:
             response_format = JobInformation(**result.json_dict)
-    except Exception as e:
-        print("ERROR RESPONSE", e)
-        raise HTTPException(status_code=500, detail="Response validation failed")
+        except Exception as e:
+            print("ERROR RESPONSE", e)
+            raise HTTPException(status_code=500, detail="Response validation failed")
+
     return {"data": response_format}
