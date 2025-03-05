@@ -1,8 +1,8 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
-from services.tools.DuckDuckGoSearchTool import DuckDuckGoSearchTool
-from services.tools.PerplexitySearchTool import PerplexitySearchTool
-from services.tools.WebScrapperTool import WebScrapperTool
+from services.tools.duckduckgo_search_tool import DuckDuckGoSearchTool
+from services.tools.perplexity_search_tool import PerplexitySearchTool
+from services.tools.web_scraper_tool import WebScrapperTool
 from models.create_table import JobInformation
 import os
 import yaml
@@ -90,7 +90,6 @@ class LatestAiDevelopmentCrew():
             expected_output=tasks_config['reporting_task']['expected_output'],
             agent=self.reporting_analyst(),
             output_json=JobInformation,
-            output_file='output/report.md' # This is the file that will be contain the final report.
         )
     @crew
     def crew(self) -> Crew:

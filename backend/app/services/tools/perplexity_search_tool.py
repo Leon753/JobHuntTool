@@ -1,5 +1,5 @@
 from crewai.tools.base_tool import BaseTool
-from services.search.perplexity_client import PerplexityClient
+from services.clients.perplexity_client import PerplexityClient
 from config.keys import PERPLEXITY_API_KEY
 
 class PerplexitySearchTool(BaseTool):

@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from openai import OpenAI
-from services.search.perplexity_client import PerplexityClient 
-from services.llms.openai_client import GPTChatCompletionClient, InMemoryResponseManager
-from services.llms.crew_client import LatestAiDevelopmentCrew
+from services.clients.perplexity_client import PerplexityClient 
+from services.clients.crew_client import LatestAiDevelopmentCrew
 from config.keys import PERPLEXITY_API_KEY, OPENAI_GPT4_KEY, ENDPOINT_OPENAI_GPT4, CHAT_VERSION, CHAT_DEPLOYMENT_NAME
 import json
 import re 
