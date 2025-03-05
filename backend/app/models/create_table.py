@@ -3,7 +3,7 @@ from typing import List, Dict, Union
 
 class ColumnResult(BaseModel):
     status: str
-    content: Union[str,List[str]]
+    content: List[str]
     source: List[str]
 
 class JobInformation(BaseModel):

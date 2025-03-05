@@ -141,6 +141,7 @@ async def get_company_job_info(email:str):
         try:
             response_format = JobInformation(**result.json_dict)
         except Exception as e:
+            
             print("ERROR RESPONSE", e)
             raise HTTPException(status_code=500, detail="Response validation failed")
 
