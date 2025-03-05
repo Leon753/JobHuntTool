@@ -13,4 +13,13 @@ async def init_db():
             )
             """
         )
+        await db.execute(
+            """
+            CREATE TABLE IF NOT EXISTS queries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                query TEXT NOT NULL,
+                response TEXT NOT NULL
+            )
+            """
+        )
         await db.commit()
