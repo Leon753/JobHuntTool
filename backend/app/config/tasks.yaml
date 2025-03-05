@@ -1,6 +1,7 @@
 research_task:
   description: >
     Conduct thorough research on {company} and the {job} role.
+    A SUMMARY HAS ALREADY BEEN PROVIDED: {summary}
     Collect detailed information including:
     - Company Overview and Name
     - Company Mission and Vision (including strategic goals)

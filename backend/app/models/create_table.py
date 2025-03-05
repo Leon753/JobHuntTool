@@ -1,9 +1,9 @@
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Union
 
 class ColumnResult(BaseModel):
     status: str
-    content: str
+    content: Union[str,List[str]]
     source: List[str]
 
 class JobInformation(BaseModel):
