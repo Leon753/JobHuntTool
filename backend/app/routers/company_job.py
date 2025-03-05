@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from openai import OpenAI
-from services.perplexity_client import PerplexityClient 
-from services.openai_client import GPTChatCompletionClient, InMemoryResponseManager
-from services.crew_client import LatestAiDevelopmentCrew
+from services.search.perplexity_client import PerplexityClient 
+from services.llms.openai_client import GPTChatCompletionClient, InMemoryResponseManager
+from services.llms.crew_client import LatestAiDevelopmentCrew
 from config.keys import PERPLEXITY_API_KEY, OPENAI_GPT4_KEY, ENDPOINT_OPENAI_GPT4, CHAT_VERSION, CHAT_DEPLOYMENT_NAME
 import json
 import re 
@@ -16,6 +16,10 @@ def string_to_json(response):
     return cleaned
 
 
+
+
+        
+
 @router.get("/email-summary")
 async def get_summary_email(email: str):
     messages = [
@@ -28,19 +32,7 @@ async def get_summary_email(email: str):
                 "content": f"The email content is provided here: {email}"
             }
         ]
-    response_manager = InMemoryResponseManager()
-    for i in messages:
-        response_manager.add_response(role=i["role"], content = i["content"])
-    chat_client = GPTChatCompletionClient(response_manager=response_manager, 
-                                          base_url=ENDPOINT_OPENAI_GPT4, 
-                                          api=OPENAI_GPT4_KEY,
-                                          api_version=CHAT_VERSION,
-                                          deployment_name=CHAT_DEPLOYMENT_NAME)
-    chat_response = chat_client.call(messages=messages)
-    msgs = chat_client.parse_response(chat_response)
-    for i in msgs:
-        chat_client.add_memory(role = "assistant", content = i)
-    return {"data": chat_client.get_history()[-1]}
+   
 
 
 
@@ -133,6 +125,7 @@ async def get_company_job_info(company: str, job_position: str):
 
 @router.get("/company-job-info-crew-ai")
 async def get_company_job_info(company: str, job_position: str):
+    # EMAIL PARSER 
     inputs = {
         'company': company,
         'job': job_position

@@ -10,12 +10,17 @@ from config.keys import *
 
 duck_search_tool = DuckDuckGoSearchTool()
 perplexity_search_tool = PerplexitySearchTool()
-# webscrapper = WebScrapperTool()
+
+
+webscrapper = WebScrapperTool()
+#TODO Need to delete this lines
 # print(webscrapper._run(urls=["https://boards.greenhouse.io/spacex/jobs/7835107002?gh_jid=7835107002"]))
+
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # Load YAML Configuration
 def load_config(file:str):
-    config_path = os.path.join(current_dir, "..", "config", file)
+    config_path = os.path.join(current_dir, "..","..", "config", file)
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file not found at: {config_path}")
     with open(config_path,"r") as file:
@@ -59,7 +64,7 @@ class LatestAiDevelopmentCrew():
         return Agent(
             config=agents_config['researcher'],
             verbose=True,
-            tools=[duck_search_tool],
+            tools=[duck_search_tool, webscrapper],
         )
 
     @agent

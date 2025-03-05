@@ -4,7 +4,7 @@ from crewai.tools.base_tool import BaseTool
 from langchain.chains import create_extraction_chain
 from typing import List
 from config.keys import *
-from backend.app.services.llms.openai_client import *
+from services.llms.openai_client import *
 from pydantic import BaseModel, Field
 from typing import Type
 import asyncio
@@ -25,7 +25,7 @@ def extract(content: List[str]) -> str:
     messages = [
             {
                 "role": "system", 
-                "content": "You are an assistant. who is reading scraped data from a website and extracting information", 
+                "content": "You are an assistant. who is reading scraped data from a list of website urls and extracting information", 
             },
             {
                 "role": "user", 
