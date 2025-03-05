@@ -3,9 +3,8 @@ from langchain_community.document_transformers import BeautifulSoupTransformer
 from crewai.tools.base_tool import BaseTool
 from langchain.chains import create_extraction_chain
 from typing import List
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from config.keys import *
-from services.openai_client import *
+from backend.app.services.llms.openai_client import *
 from pydantic import BaseModel, Field
 from typing import Type
 import asyncio
