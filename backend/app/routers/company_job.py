@@ -63,22 +63,22 @@ async def get_company_job_info(company: str, job_position: str):
                 "results": {{
                     "job_description": {{
                     "status": "<Validated|Needs Work|Incorrect>",
-                    "content": "<Concise summary of the job posting>",
+                    "content": "List<Concise summary of the job posting>",
                     "source": ["<url1>", "<url2>", ...]
                     }},
                     "pay_range": {{
                     "status": "<Validated|Needs Work|Incorrect>",
-                    "content": "<Details on the salary range>",
+                    "content": "List<Details on the salary range>",
                     "source": ["<url1>", "<url2>", ...]
                     }},
                     "interview_process": {{
                     "status": "<Validated|Needs Work|Incorrect>",
-                    "content": "<Details on the interview process, including round counts (behavioral and technical) and overall duration>",
+                    "content": "List<Details on the interview process, including round counts (behavioral and technical) and overall duration>",
                     "source": ["<url1>", "<url2>", ...]
                     }},
                     "example_interview_experience": {{
                     "status": "<Validated|Needs Work|Incorrect>",
-                    "content": "<Example of an interview experience>",
+                    "content": "List<Example of an interview experience>",
                     "source": ["<url1>", "<url2>", ...]
                     }}
                 }}

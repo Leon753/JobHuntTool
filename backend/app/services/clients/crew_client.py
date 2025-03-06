@@ -14,7 +14,7 @@ perplexity_search_tool = PerplexitySearchTool()
 
 webscrapper = WebScrapperTool()
 #TODO Need to delete this lines
-# print(webscrapper._run(urls=["https://boards.greenhouse.io/spacex/jobs/7835107002?gh_jid=7835107002"]))
+
 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -64,7 +64,7 @@ class LatestAiDevelopmentCrew():
         return Agent(
             config=agents_config['researcher'],
             verbose=True,
-            tools=[duck_search_tool, webscrapper],
+            tools=[duck_search_tool],
         )
 
     @agent
