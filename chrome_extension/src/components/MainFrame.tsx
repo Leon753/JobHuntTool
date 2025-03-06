@@ -5,15 +5,19 @@ import { parseEmailParts } from "../helpers/helperFn";
 import CircularProgress from '@mui/material/CircularProgress';
 import { Button } from "@mui/material";
 
-
 interface Props {}
 
 type Email = {
   id: string
 }
 
+type SpreadSheet = {
+  spreadsheetId: string
+}
+
 function MainFrame() {
   const [emailSummaryData, setEmailSummaryData] = useState<String[]>([]);
+  const [spreadSheetId, setSpreadSheetID] = useState<String>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -70,15 +74,88 @@ function MainFrame() {
     }
   };
 
+  const createSpreadsheet = async () => {
+    setLoading(true);
+    
+    try {
+      const token = await getAuthToken();
+      const spreadsheetCreationResponse = await fetch(
+        'https://sheets.googleapis.com/v4/spreadsheets',
+        {
+          method: "POST",
+          headers: {
+           "Content-Type": 'application/json',
+           Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            properties: {
+              title: "JobHunting"
+            }
+          })
+        }
+      );     
+      const spreadSheetJson = await spreadsheetCreationResponse.json();
+      console.log(spreadSheetJson);
+      setSpreadSheetID((spreadSheetJson as SpreadSheet).spreadsheetId);
+      return spreadsheetCreationResponse;
+    } catch (err) {
+      // TODO (developer) - Handle exception
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const updateSpreadSheet = async (spreadsheetId: String) => {
+    setLoading(true);
+    try {
+      const token = await getAuthToken();
+      const spreadsheetUpdateResponse = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchUpdate`,
+        {
+          method: "POST",
+          headers: {
+           "Content-Type": 'application/json',
+           Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            valueInputOption: "USER_ENTERED",
+            data: [
+              {
+                range: "A1:B1",
+                majorDimension: "ROWS",
+                values: [
+                  ["hi","JobHunter"]
+                ]
+              }
+            ],
+            includeValuesInResponse: false,
+            responseValueRenderOption: "FORMATTED_VALUE",
+            responseDateTimeRenderOption: "SERIAL_NUMBER"
+          })
+        }
+      )
+      console.log(spreadsheetUpdateResponse.status);
+    } catch (err) {
+      console.log(err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <>
       <div>Hello. Let's start by fetching your emails</div>
       <Button onClick={fetchEmails}>Fetch Emails</Button>
+      <Button onClick={createSpreadsheet}>Create Spreadsheet</Button>
+      <Button onClick={() => updateSpreadSheet(spreadSheetId)}>Update Spreadsheet</Button>
       <>
       {
         loading ? 
         <CircularProgress /> : <>{emailSummaryData}</>
       }</>
+      <p>{spreadSheetId}</p>
     </>
   );
 }
