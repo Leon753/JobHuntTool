@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Dict, Union
+from typing import List, Dict
 
 class ColumnResult(BaseModel):
     status: str
