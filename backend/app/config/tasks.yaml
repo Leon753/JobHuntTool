@@ -59,4 +59,3 @@ reporting_task:
                 }}
             }}
   agent: reporting_analyst
-  output_file: report.md
