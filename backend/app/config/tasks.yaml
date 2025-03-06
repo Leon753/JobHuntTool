@@ -1,6 +1,7 @@
 research_task:
   description: >
     Conduct thorough research on {company} and the {job} role.
+    A SUMMARY HAS ALREADY BEEN PROVIDED: {summary}
     Collect detailed information including:
     - Company Overview and Name
     - Company Mission and Vision (including strategic goals)
@@ -26,14 +27,36 @@ reporting_task:
       - Required Skills
       - Interview Experiences
       - LeetCode Questions
+      - Sources: ensure they are valid URLs
   expected_output: >
     A JSON object conforming to a schema that includes the following fields:
-      - company_name
-      - company_mission_and_vision
-      - job_title
-      - key_responsibilities
-      - required_skills
-      - interview_experiences
-      - leetcode_questions
+      Output Requirements:
+            - Output a JSON object in the following format, and do not include any additional text or markdown:
+
+            {{
+                "company": "{company}",
+                "results": {{
+                    "job_description": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "List<Concise summary of the job posting>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "pay_range": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "List<Details on the salary range>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "interview_process": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "List<Details on the interview process, including round counts (behavioral and technical) and overall duration>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "example_interview_experience": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "List<Example of an interview experience>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }}
+                }}
+            }}
   agent: reporting_analyst
   output_file: report.md

@@ -3,7 +3,7 @@ from typing import List, Dict
 
 class ColumnResult(BaseModel):
     status: str
-    content: str
+    content: List[str]
     source: List[str]
 
 class JobInformation(BaseModel):
