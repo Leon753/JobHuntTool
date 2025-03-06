@@ -1,6 +1,7 @@
 research_task:
   description: >
     Conduct thorough research on {company} and the {job} role.
+    A SUMMARY HAS ALREADY BEEN PROVIDED: {summary}
     Collect detailed information including:
     - Company Overview and Name
     - Company Mission and Vision (including strategic goals)
@@ -39,25 +40,24 @@ reporting_task:
                 "results": {{
                     "job_description": {{
                     "status": "<Validated|Needs Work|Incorrect>",
-                    "content": "MUST BE A STRING <Concise summary of the job posting>",
+                    "content": "List<Concise summary of the job posting>",
                     "source": ["<url1>", "<url2>", ...]
                     }},
                     "pay_range": {{
                     "status": "<Validated|Needs Work|Incorrect>",
-                    "content": " MUST BE A STRING <Details on the salary range>",
+                    "content": " List<Details on the salary range>",
                     "source": ["<url1>", "<url2>", ...]
                     }},
                     "interview_process": {{
                     "status": "<Validated|Needs Work|Incorrect>",
-                    "content": "MUST BE A STRING <Details on the interview process, including round counts (behavioral and technical) and overall duration>",
+                    "content": "List <Details on the interview process, including round counts (behavioral and technical) and overall duration>",
                     "source": ["<url1>", "<url2>", ...]
                     }},
                     "example_interview_experience": {{
                     "status": "<Validated|Needs Work|Incorrect>",
-                    "content": "MUST BE A STRING <Example of an interview experience>",
+                    "content": "List<Example of an interview experience>",
                     "source": ["<url1>", "<url2>", ...]
                     }}
                 }}
             }}
   agent: reporting_analyst
-  output_file: report.md

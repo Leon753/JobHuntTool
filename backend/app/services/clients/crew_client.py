@@ -49,7 +49,7 @@ config = dict(
 )
 
 @CrewBase
-class LatestAiDevelopmentCrew():
+class TableMakerCrew():
     @before_kickoff
     def before_kickoff_function(self, inputs):
         print(f"Before kickoff function with inputs: {inputs}")
@@ -64,7 +64,7 @@ class LatestAiDevelopmentCrew():
         return Agent(
             config=agents_config['researcher'],
             verbose=True,
-            tools=[duck_search_tool],
+            tools=[perplexity_search_tool],
         )
 
     @agent

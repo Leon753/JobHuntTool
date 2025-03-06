@@ -1,37 +1,23 @@
 from fastapi import APIRouter, HTTPException
-from openai import OpenAI
 from services.clients.perplexity_client import PerplexityClient 
-from services.clients.crew_client import LatestAiDevelopmentCrew
-from config.keys import PERPLEXITY_API_KEY, OPENAI_GPT4_KEY, ENDPOINT_OPENAI_GPT4, CHAT_VERSION, CHAT_DEPLOYMENT_NAME
+from services.clients.crew_client import TableMakerCrew
+from config.keys import PERPLEXITY_API_KEY
 import json
-import re 
 from models.create_table import JobInformation
-
+from models.email_summary import GPT_Email_Summary_Response
+from utils.helpers import string_to_json
+from services.summary.email import email_summary
+from services.memory import memo_service
+# set up logger 
 router = APIRouter()
 
-def string_to_json(response):
-    cleaned = re.sub(r"^```json\s*", "", response)
-    cleaned = re.sub(r"\s*```$", "", cleaned)
-    return cleaned
 
 
-
-
-        
 
 @router.get("/email-summary")
 async def get_summary_email(email: str):
-    messages = [
-            {
-                "role": "system", 
-                "content": "You are an assistant. summarizing an email and prepare a prompt for prepxilty to scrape the web for more information", 
-            },
-            {
-                "role": "user", 
-                "content": f"The email content is provided here: {email}"
-            }
-        ]
-   
+    return email_summary(email)
+
 
 
 
@@ -114,26 +100,43 @@ async def get_company_job_info(company: str, job_position: str):
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     try:
-        response_format = JobInformation(**response)
+        response = JobInformation(**response)
     except Exception as e:
         print("ERROR RESPONSE", e)
         raise HTTPException(status_code=500, detail="Response validation failed")
 
-    return {"data": response_format}
+    return response
 
 
 @router.get("/company-job-info-crew-ai")
-async def get_company_job_info(company: str, job_position: str):
-    # EMAIL PARSER 
+async def get_company_job_info(email:str):
+    summary_json:GPT_Email_Summary_Response = email_summary(email)
+    
+    query_key = summary_json.company+summary_json.job_position
     inputs = {
-        'company': company,
-        'job': job_position
+        'company': summary_json.company,
+        'job': summary_json.job_position,
+        'summary': summary_json.summary
     }
-    result = LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)   
-    try:
-        response_format = JobInformation(**result.json_dict)
-    except Exception as e:
-        print("ERROR RESPONSE", e)
-        raise HTTPException(status_code=500, detail="Response validation failed")
+
+    if await memo_service.query_exists(query_key):
+        print("EXISTS")
+        response_dict = await memo_service.get_response_for_query(query_key)
+        try:
+            response_format = JobInformation(**response_dict)
+        except Exception as e:
+            print("ERROR RESPONSE", e)
+            raise HTTPException(status_code=500, detail="Response validation failed")
+    else:
+        result = TableMakerCrew().crew().kickoff(inputs=inputs)   
+        await memo_service.save_query_response(query_key, result.json_dict)
+        print("INSERTING")
+
+        try:
+            response_format = JobInformation(**result.json_dict)
+        except Exception as e:
+            
+            print("ERROR RESPONSE", e)
+            raise HTTPException(status_code=500, detail="Response validation failed")
 
     return {"data": response_format}

@@ -1,5 +1,5 @@
 
-from typing import List, Dict, AnyStr, Union
+from typing import List, Dict, AnyStr
 import requests
 from services.base.llm_client import LLMClientBase
 
@@ -32,7 +32,7 @@ class AzureAIClient(LLMClientBase):
     
 
 class GPTCompletionClient(AzureAIClient):
-    def __init__(self, api, base_url, api_version, deployment_name, response_manager):
+    def __init__(self, api, base_url, api_version, deployment_name, response_manager=None):
         super().__init__(api, base_url, api_version, deployment_name, response_manager)
         self.uri = f"{base_url}/openai/deployments/{deployment_name}/completions?api-version={api_version}"
 

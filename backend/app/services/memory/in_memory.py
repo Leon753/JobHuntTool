@@ -1,5 +1,6 @@
-from backend.app.services.base.llm_response_manager import LLMResponseManager
+from services.base.llm_response_manager import LLMResponseManager
 from typing import List, Dict
+
 class InMemoryResponseManager(LLMResponseManager):
     def __init__(self):
         """Initialize an empty dict to store responses."""
