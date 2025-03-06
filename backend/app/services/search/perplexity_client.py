@@ -33,7 +33,7 @@ class PerplexityClient:
             logger.debug("Request payload: %s", json.dumps(payload, indent=2))
         
         try:
-            response = requests.post(self.api_url, headers=headers, json=payload, timeout=timeout)
+            response = requests.post(self.api_url, headers=headers, json=payload, timeout=timeout,verify=ssl_context)
             response.raise_for_status()
             json_response = response.json()
             return json_response["choices"][0]["message"]["content"]

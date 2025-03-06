@@ -1,109 +1,83 @@
 from fastapi import APIRouter, HTTPException
 from openai import OpenAI
 from services.perplexity_client import PerplexityClient 
-from services.openai_client import GPTChatCompletionClient, GPTCompletionClient, InMemoryResponseManager
-from dotenv import load_dotenv
-from pydantic import BaseModel
-import requests
-import os
+from services import memo_service 
+from services.openai_client import GPTChatCompletionClient, InMemoryResponseManager
+from services.crew_client import LatestAiDevelopmentCrew
+from services.summary.Email import email_summary
+from config.keys import PERPLEXITY_API_KEY, OPENAI_GPT4_KEY, ENDPOINT_OPENAI_GPT4, CHAT_VERSION, CHAT_DEPLOYMENT_NAME
 import json
-from typing import Dict, List
 import re 
+from models.create_table import JobInformation
+from models.email_summary import GPT_Email_Summary_Response
+from utils.helpers import string_to_json
+import logging
+
+# set up logger 
 router = APIRouter()
-load_dotenv()
-PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
-PERPLEXITY_API_URL = os.getenv("PERPLEXITY_API_URL")
-OPENAI_GPT4_KEY = os.getenv("AZURE_OPENAI_KEY_GPT_4")
-ENDPOINT_OPENAI_GPT4 = os.getenv("GPT4_ENDPOINT")
-
-CHAT_VERSION = "2024-08-01-preview"  # Update if needed
-CHAT_DEPLOYMENT_NAME = "gpt-4o"  # Replace with your deployed model name
-
-"""
-perplexity_client = PerplexityClient(
-    api_key=PERPLEXITY_API_KEY,
-    api_url=PERPLEXITY_API_URL,
-    model="sonar"
-)
-"""
-print(PERPLEXITY_API_URL)
-client = OpenAI(api_key=PERPLEXITY_API_KEY, base_url="https://api.perplexity.ai")
 
 
 
-class Email_Summary_Request(BaseModel):
-    content: str
 
-@router.post("/email-summary")
-async def get_summary_email(packet: Email_Summary_Request):
-    messages = [
-            {
-                "role": "system", 
-                "content": "You are an assistant. summarizing an email and prepare a prompt for prepxilty to scrape the web for more information", 
-            },
-            {
-                "role": "user", 
-                "content": f"The email content is provided here: {packet.content}"
-            }
-        ]
-    response_manager = InMemoryResponseManager()
-    for i in messages:
-        response_manager.add_response(role=i["role"], content = i["content"])
-    chat_client = GPTChatCompletionClient(response_manager=response_manager, 
-                                          base_url=ENDPOINT_OPENAI_GPT4, 
-                                          api=OPENAI_GPT4_KEY,
-                                          api_version=CHAT_VERSION,
-                                          deployment_name=CHAT_DEPLOYMENT_NAME)
-    chat_response = chat_client.call(messages=messages)
-    msgs = chat_client.parse_response(chat_response)
-    for i in msgs:
-        chat_client.add_memory(role = "assistant", content = i)
-    return {"data": chat_client.get_history()[-1]}
 
-class ColumnResult(BaseModel):
-    status: str
-    content: str
-    source: List[str]
 
-class JobInformation(BaseModel):
-    company: str
-    results: Dict[str, ColumnResult]
+
+@router.get("/email-summary")
+async def get_summary_email(email: str):
+    return email_summary(email)
+
+
+
 
 @router.get("/company-job-info")
 async def get_company_job_info(company: str, job_position: str):
     # Build the query for the Perplexity API
-    query = f"""Provide summary about {company} and the job position {job_position} by searching LinkedIn, the Company Career Site, and Indeed for job information. Then search through LevelsFYI for details on the salary range, and review GlassDoor and similar sites for insights on the interview process.
+    query = f"""
+        Task:
+            - Provide a comprehensive summary about {company} and the job position {job_position}. Gather the following information:
+            1. **Job Description:**
+                - Search LinkedIn, the Company Career Site, Indeed, and Glassdoor for the job posting details.
+            2. **Salary/Pay Range:**
+                - Search http://levels.fyi/ for details on the salary range for {job_position} at {company}.
+            3. **Interview Process:**
+                - Gather insights from interview process reviews.
+                - Identify whether the technical interviews are more focused on algorithms or data structures.
+                - Explicity specify the range of total number of rounds, breaking them down into behavioral and technical rounds.
+                - Include the typical overall duration of the interview process.
+            4. **Interview Experience:**
+                - Find an example of an interview experience for {job_position} at {company}.
+            5. **Recommended Preparation:**
+                - Search Reddit and Leetcode for recommended Leetcode problems for {company}.
 
-    Output a JSON object in the following format:
-        {{
-        "company": "{company}",
-        "results": {{
-            "job_description": {{
-                "status": "<Validated|Needs Work|Incorrect>",
-                "content": "<Provide a concise summary of the job posting>",
-                "source": ["<url1>", "<url2>", ...]
-            }},
-            "pay_range": {{
-                "status": "<Validated|Needs Work|Incorrect>",
-                "content": "<Provide details on the salary range>",
-                "source": ["<url1>", "<url2>", ...]
-            }},
-            "leetcode": {{ #provide common leetcode questions for the position
-                "status": "<Validated|Needs Work|Incorrect>",
-                "content": "<Provide details on the salary range>",
-                "source": ["<url1>", "<url2>", ...]
-            }},
-            "behavioral": {{ #provide common behavioral questions for the position
-                "status": "<Validated|Needs Work|Incorrect>",
-                "content": "<Provide details on the salary range>",
-                "source": ["<url1>", "<url2>", ...]
+            Output Requirements:
+            - Output a JSON object in the following format, and do not include any additional text or markdown:
+
+            {{
+                "company": "{company}",
+                "results": {{
+                    "job_description": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "List<Concise summary of the job posting>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "pay_range": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "List<Details on the salary range>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "interview_process": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "List<Details on the interview process, including round counts (behavioral and technical) and overall duration>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "example_interview_experience": {{
+                    "status": "<Validated|Needs Work|Incorrect>",
+                    "content": "List<Example of an interview experience>",
+                    "source": ["<url1>", "<url2>", ...]
+                    }}
+                }}
             }}
-        }}
-        }}
-    Only output the JSON object.    NO MARK DOWN"""
-
-    
-
+    """
     messages = [
         {
             "role": "system",
@@ -126,20 +100,51 @@ async def get_company_job_info(company: str, job_position: str):
                                        api_url="https://api.perplexity.ai/chat/completions", 
                                        model="sonar")
     response = await prelixty_client.get_response(messages=messages, response_format=response_format)
-    print(type(response))
-    print(("Raw response from API: %r", response))
-    cleaned = re.sub(r"^```json\s*", "", response)
-    cleaned = re.sub(r"\s*```$", "", cleaned)
+    
     try:
-        response = json.loads(cleaned)
+        response = json.loads(string_to_json(response))
     except Exception as e:
         print("ERROR RESPONSE", e)
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     try:
-        response_format = JobInformation(**response)
+        response = JobInformation(**response)
     except Exception as e:
         print("ERROR RESPONSE", e)
         raise HTTPException(status_code=500, detail="Response validation failed")
+
+    return response
+
+
+@router.get("/company-job-info-crew-ai")
+async def get_company_job_info(email:str):
+    summary_json:GPT_Email_Summary_Response = email_summary(email)
+    
+    query_key = summary_json.company+summary_json.job_position
+    inputs = {
+        'company': summary_json.company,
+        'job': summary_json.job_position,
+        'summary': summary_json.summary
+    }
+
+    if await memo_service.query_exists(query_key):
+        print("EXISTS")
+        response_dict = await memo_service.get_response_for_query(query_key)
+        try:
+            response_format = JobInformation(**response_dict)
+        except Exception as e:
+            print("ERROR RESPONSE", e)
+            raise HTTPException(status_code=500, detail="Response validation failed")
+    else:
+        result = LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)   
+        await memo_service.save_query_response(query_key, result.json_dict)
+        print("INSERTING")
+
+        try:
+            response_format = JobInformation(**result.json_dict)
+        except Exception as e:
+            
+            print("ERROR RESPONSE", e)
+            raise HTTPException(status_code=500, detail="Response validation failed")
 
     return {"data": response_format}

@@ -53,7 +53,7 @@ class InMemoryResponseManager(LLMResponseManager):
             raise IndexError("Response index out of range.")
         
 class LLMClientBase(ABC):
-    def __init__(self, api:str, base_url:str, response_manager:LLMResponseManager):
+    def __init__(self, api:str, base_url:str, response_manager:LLMResponseManager=None):
         self.api = api 
         self.base_url = base_url
         self.response_manager = response_manager
@@ -80,7 +80,7 @@ class LLMClientBase(ABC):
 
 
 class AzureAIClient(LLMClientBase):
-    def __init__(self, api:str, base_url:str, deployment_name:str, api_version:str, response_manager):
+    def __init__(self, api:str, base_url:str, deployment_name:str, api_version:str, response_manager=None):
         super().__init__(api, base_url, response_manager=response_manager)
         self.api_version = api_version
         self.deployment_name = deployment_name
@@ -107,7 +107,7 @@ class AzureAIClient(LLMClientBase):
     
 
 class GPTCompletionClient(AzureAIClient):
-    def __init__(self, api, base_url, api_version, deployment_name, response_manager):
+    def __init__(self, api, base_url, api_version, deployment_name, response_manager=None):
         super().__init__(api, base_url, api_version, deployment_name, response_manager)
         self.uri = f"{base_url}/openai/deployments/{deployment_name}/completions?api-version={api_version}"
 
@@ -135,7 +135,7 @@ class GPTCompletionClient(AzureAIClient):
         return msgs
 
 class GPTChatCompletionClient(AzureAIClient):
-    def __init__(self, api, base_url, api_version, deployment_name, response_manager):
+    def __init__(self, api, base_url, api_version, deployment_name, response_manager=None):
         super().__init__(api, base_url, api_version=api_version, deployment_name=deployment_name, response_manager=response_manager)
         self.uri = f"{self.base_url}/openai/deployments/{self.deployment_name}/chat/completions?api-version={self.api_version}"
        
