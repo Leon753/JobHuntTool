@@ -1,5 +1,5 @@
 from crewai.tools.base_tool import BaseTool
-from services.perplexity_client import PerplexityClient
+from services.clients.perplexity_client import PerplexityClient
 from config.keys import PERPLEXITY_API_KEY
 
 class PerplexitySearchTool(BaseTool):
@@ -14,7 +14,6 @@ class PerplexitySearchTool(BaseTool):
             "Authorization": "Bearer YOUR_PERPLEXITY_API_KEY",
             "Content-Type": "application/json"
         }
-        payload = {"query": query}
         messages = [
             {
                 "role": "system",
@@ -34,3 +33,4 @@ class PerplexitySearchTool(BaseTool):
                                        model="sonar")
         result = prelixty_client.get_response_sync(messages=messages)
         return result
+

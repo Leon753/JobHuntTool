@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from models.user import UserAndExcelId
-from services.user_service import save_user_info_to_db, get_user_excel_from_db, delete_user_info_from_db
+from services.user.user_service import save_user_info_to_db, get_user_excel_from_db, delete_user_info_from_db
 
 router = APIRouter()
 

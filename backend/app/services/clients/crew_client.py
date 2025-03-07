@@ -1,19 +1,26 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
-from langchain_community.tools import DuckDuckGoSearchRun
-from services.tools.PerplexitySearchTool import PerplexitySearchTool
+from services.tools.duckduckgo_search_tool import DuckDuckGoSearchTool
+from services.tools.perplexity_search_tool import PerplexitySearchTool
+from services.tools.web_scraper_tool import WebScrapperTool
 from models.create_table import JobInformation
 import os
 import yaml
-from config.keys import OPENAI_GPT4_KEY, ENDPOINT_OPENAI_GPT4, CHAT_DEPLOYMENT_NAME, CHAT_VERSION
+from config.keys import *
+
+duck_search_tool = DuckDuckGoSearchTool()
+perplexity_search_tool = PerplexitySearchTool()
 
 
-search_tool = PerplexitySearchTool()
+webscrapper = WebScrapperTool()
+#TODO Need to delete this lines
+
+
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
-
 # Load YAML Configuration
 def load_config(file:str):
-    config_path = os.path.join(current_dir, "..", "config", file)
+    config_path = os.path.join(current_dir, "..","..", "config", file)
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file not found at: {config_path}")
     with open(config_path,"r") as file:
@@ -22,8 +29,27 @@ def load_config(file:str):
 agents_config = load_config("agents.yaml")
 tasks_config = load_config("tasks.yaml")
 
+
+config = dict(
+    llm=dict(
+        provider="azure_openai",
+        config=dict(
+            model="gpt-4o",
+        ),
+    ),
+    embedder=dict(
+        provider="azure_openai",
+        config=dict(
+            model="text-embedding-3-small",
+            deployment_name="text-embedding-3-small",
+            api_base = TEXT_EMBEDDINGS_API_BASE,
+            api_key=TEXT_EMBEDDINGS_API_KEY,
+        ),
+    )
+)
+
 @CrewBase
-class LatestAiDevelopmentCrew():
+class TableMakerCrew():
     @before_kickoff
     def before_kickoff_function(self, inputs):
         print(f"Before kickoff function with inputs: {inputs}")
@@ -38,7 +64,7 @@ class LatestAiDevelopmentCrew():
         return Agent(
             config=agents_config['researcher'],
             verbose=True,
-            tools=[search_tool],
+            tools=[perplexity_search_tool],
         )
 
     @agent
@@ -64,7 +90,6 @@ class LatestAiDevelopmentCrew():
             expected_output=tasks_config['reporting_task']['expected_output'],
             agent=self.reporting_analyst(),
             output_json=JobInformation,
-            output_file='output/report.md' # This is the file that will be contain the final report.
         )
     @crew
     def crew(self) -> Crew:

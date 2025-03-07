@@ -1,19 +1,14 @@
 from fastapi import APIRouter, HTTPException
-from openai import OpenAI
-from services.perplexity_client import PerplexityClient 
-from services import memo_service 
-from services.openai_client import GPTChatCompletionClient, InMemoryResponseManager
-from services.crew_client import LatestAiDevelopmentCrew
-from services.summary.Email import email_summary
-from config.keys import PERPLEXITY_API_KEY, OPENAI_GPT4_KEY, ENDPOINT_OPENAI_GPT4, CHAT_VERSION, CHAT_DEPLOYMENT_NAME
+from services.clients.perplexity_client import PerplexityClient 
+from services.clients.crew_client import TableMakerCrew
+from config.keys import PERPLEXITY_API_KEY
 import json
-import re 
 from models.create_table import JobInformation
 from models.email_summary import GPT_Email_Summary_Response
 from utils.helpers import string_to_json
+from services.summary.email_summary import email_summary
+from services.memory import memo_service
 import asyncio
-import logging
-
 # set up logger 
 router = APIRouter()
 
@@ -138,7 +133,7 @@ async def get_company_job_info(email:str):
             print("ERROR RESPONSE", e)
             raise HTTPException(status_code=500, detail="Response validation failed")
     else:
-        result = await asyncio.to_thread(LatestAiDevelopmentCrew().crew().kickoff, inputs) 
+        result = await asyncio.to_thread(TableMakerCrew().crew().kickoff, inputs) 
         await memo_service.save_query_response(query_key, result.json_dict)
         print("INSERTING")
 

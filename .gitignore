@@ -1,5 +1,13 @@
 .DS_Store
 .env
+# Virtual environments
+env/
+.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.db
 output/*
 env/*
 *.db
