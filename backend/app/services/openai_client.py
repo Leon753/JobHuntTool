@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, AnyStr, Union
 import requests
+import time 
+import random
 
 class LLMResponseManager(ABC):
     """
@@ -84,7 +86,8 @@ class AzureAIClient(LLMClientBase):
         super().__init__(api, base_url, response_manager=response_manager)
         self.api_version = api_version
         self.deployment_name = deployment_name
-        
+        self.max_retries=5
+        self.base_delay=1.0
 
         # Headers
         self.headers = {
@@ -93,14 +96,23 @@ class AzureAIClient(LLMClientBase):
         }
 
     def api_call(self, **kwargs) -> Dict:
-        response = requests.post(self.uri, headers=self.headers, json=kwargs["payload"])
-        
-        try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            raise ValueError(f"Request failed: {response.status_code} - {response.text}") from e
-        
-        return response.json()
+        for attempt in range(self.max_retries):
+            try:
+                response = requests.post(self.uri, headers=self.headers, json=kwargs["payload"])
+                if response.status_code == 200:
+                    return response.json()  # Return response if successful
+                
+                elif response.status_code == 429:
+                        # Compute exponential backoff with jitter
+                        delay = self.base_delay * (2 ** attempt) + random.uniform(0, 0.5)
+                        print(f"Rate limited (429). Retrying in {delay:.2f} seconds...")
+                        time.sleep(delay)
+                else:
+                    response.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                raise ValueError(f"Request failed: {response.status_code} - {response.text}") from e
+            
+
 
     
     

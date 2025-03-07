@@ -11,6 +11,7 @@ import re
 from models.create_table import JobInformation
 from models.email_summary import GPT_Email_Summary_Response
 from utils.helpers import string_to_json
+import asyncio
 import logging
 
 # set up logger 
@@ -136,11 +137,12 @@ async def get_company_job_info(email:str):
             print("ERROR RESPONSE", e)
             raise HTTPException(status_code=500, detail="Response validation failed")
     else:
-        result = LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)   
+        result = await asyncio.to_thread(LatestAiDevelopmentCrew().crew().kickoff, inputs) 
         await memo_service.save_query_response(query_key, result.json_dict)
         print("INSERTING")
 
         try:
+            print(result.json_dict)
             response_format = JobInformation(**result.json_dict)
         except Exception as e:
             
