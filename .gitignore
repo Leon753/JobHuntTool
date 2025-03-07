@@ -4,4 +4,3 @@ output/*
 env/*
 *.db
 backend/app/output/*
-chrome_extension/manifest.json
