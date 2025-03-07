@@ -21,6 +21,7 @@ def email_summary(email:str) -> GPT_Email_Summary_Response:
                 "company": **insert company name here**,
                 "job_position": **insert job position here**,
                 "summary": **insert summary here**
+                "status": **insert Enum One of: InReview, Interviewing, Offer, Rejected**
             }}
             """
     messages = [

@@ -22,7 +22,6 @@ router = APIRouter()
 
 
 
-
 @router.get("/email-summary")
 async def get_summary_email(email: str):
     return email_summary(email)
@@ -117,6 +116,7 @@ async def get_company_job_info(company: str, job_position: str):
     return response
 
 
+
 @router.get("/company-job-info-crew-ai")
 async def get_company_job_info(email:str):
     summary_json:GPT_Email_Summary_Response = email_summary(email)
@@ -125,7 +125,8 @@ async def get_company_job_info(email:str):
     inputs = {
         'company': summary_json.company,
         'job': summary_json.job_position,
-        'summary': summary_json.summary
+        'summary': summary_json.summary,
+        "status": str(summary_json.status)
     }
 
     if await memo_service.query_exists(query_key):
