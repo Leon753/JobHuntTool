@@ -6,10 +6,13 @@ import json
 from models.create_table import JobInformation
 from models.email_summary import GPT_Email_Summary_Response
 from utils.helpers import string_to_json
-from services.summary.email import email_summary
+from services.summary.email_summary import email_summary
 from services.memory import memo_service
+import asyncio
 # set up logger 
 router = APIRouter()
+
+
 
 
 
@@ -108,6 +111,7 @@ async def get_company_job_info(company: str, job_position: str):
     return response
 
 
+
 @router.get("/company-job-info-crew-ai")
 async def get_company_job_info(email:str):
     summary_json:GPT_Email_Summary_Response = email_summary(email)
@@ -116,7 +120,8 @@ async def get_company_job_info(email:str):
     inputs = {
         'company': summary_json.company,
         'job': summary_json.job_position,
-        'summary': summary_json.summary
+        'summary': summary_json.summary,
+        "status": str(summary_json.status)
     }
 
     if await memo_service.query_exists(query_key):
@@ -128,11 +133,12 @@ async def get_company_job_info(email:str):
             print("ERROR RESPONSE", e)
             raise HTTPException(status_code=500, detail="Response validation failed")
     else:
-        result = TableMakerCrew().crew().kickoff(inputs=inputs)   
+        result = await asyncio.to_thread(TableMakerCrew().crew().kickoff, inputs) 
         await memo_service.save_query_response(query_key, result.json_dict)
         print("INSERTING")
 
         try:
+            print(result.json_dict)
             response_format = JobInformation(**result.json_dict)
         except Exception as e:
             
