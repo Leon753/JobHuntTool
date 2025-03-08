@@ -1,14 +1,9 @@
-from langchain_community.document_loaders import AsyncChromiumLoader
-from langchain_community.document_transformers import BeautifulSoupTransformer
 from crewai.tools.base_tool import BaseTool
-from langchain.chains import create_extraction_chain
 from typing import List
 from config.keys import *
 from services.clients.openai_client import *
 from pydantic import BaseModel, Field
 from typing import Type
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
@@ -52,7 +47,6 @@ class WebScrapperTool(BaseTool):
         for url in urls:
             driver.get(url)
             content = driver.page_source
-            print(content)
             docs.append(content)
         # Close the WebDriver
         driver.quit()
