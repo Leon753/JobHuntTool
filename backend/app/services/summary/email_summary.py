@@ -40,15 +40,16 @@ def email_summary(email:str) -> GPT_Email_Summary_Response:
                                           api=OPENAI_GPT4_KEY,
                                           api_version=CHAT_VERSION,
                                           deployment_name=CHAT_DEPLOYMENT_NAME)
-    # response_format = {
-    #         "type": "json_schema",
-    #     "json_schema": {"name": "email_schema", "schema": email_schema}
-    # }
+    response_format = {
+            "type": "json_schema",
+        "json_schema": {"name": "email_schema", "schema": email_schema}
+    }
     
     chat_response = chat_client.call(messages=messages, response_format=None)
     msgs = chat_client.parse_response(chat_response)
     try: 
-        response = json.loads(string_to_json(msgs[-1]))
+        msg  =  string_to_json(msgs[-1])
+        response = json.loads(msg)
     except Exception as e:
         print("ERROR RESPONSE", e)
         raise SyntaxError("Response validation failed")
