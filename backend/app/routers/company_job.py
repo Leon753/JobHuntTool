@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from services.clients.perplexity_client import PerplexityClient 
 from services.clients.crew_client import TableMakerCrew
 from config.keys import PERPLEXITY_API_KEY
@@ -8,6 +8,8 @@ from models.email_summary import GPT_Email_Summary_Response
 from utils.helpers import string_to_json
 from services.summary.email_summary import email_summary
 from services.memory import memo_service
+from services.spreadsheet_service import create_and_update_spreadsheet
+
 import asyncio
 # set up logger 
 router = APIRouter()
@@ -112,8 +114,8 @@ async def get_company_job_info(company: str, job_position: str):
 
 
 
-@router.get("/company-job-info-crew-ai")
-async def get_company_job_info(email:str):
+@router.post("/company-job-info-crew-ai")
+async def get_company_job_info(email:str, token: str = Query(...)):
     summary_json:GPT_Email_Summary_Response = email_summary(email)
     
     query_key = summary_json.company+summary_json.job_position
@@ -125,7 +127,6 @@ async def get_company_job_info(email:str):
     }
 
     if await memo_service.query_exists(query_key):
-        print("EXISTS")
         response_dict = await memo_service.get_response_for_query(query_key)
         try:
             response_format = JobInformation(**response_dict)
@@ -135,14 +136,17 @@ async def get_company_job_info(email:str):
     else:
         result = await asyncio.to_thread(TableMakerCrew().crew().kickoff, inputs) 
         await memo_service.save_query_response(query_key, result.json_dict)
-        print("INSERTING")
-
         try:
-            print(result.json_dict)
             response_format = JobInformation(**result.json_dict)
         except Exception as e:
-            
             print("ERROR RESPONSE", e)
             raise HTTPException(status_code=500, detail="Response validation failed")
 
-    return {"data": response_format}
+    
+    try:
+        spreadsheet_result = await create_and_update_spreadsheet(token, response_format)
+    except Exception as e:
+        print("Spreadsheet update error:", e)
+        raise HTTPException(status_code=500, detail="Failed to update spreadsheet")
+
+    return {"spreadsheet": spreadsheet_result}

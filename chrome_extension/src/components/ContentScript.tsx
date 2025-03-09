@@ -2,8 +2,6 @@
 import { getAuthToken } from "../chrome/utils";
 import { parseEmailParts } from "../helpers/helperFn";
 
-console.log("Content script loaded as module.");
-
 /* ======================================================
    TYPES & INTERFACES
 ====================================================== */
@@ -36,115 +34,6 @@ export interface JobInfoResponse {
   };
 }
 
-/* ======================================================
-   SPREADSHEET & TABLE FUNCTIONS
-====================================================== */
-
-/** Returns the first content value from each JobDetail in JobResults */
-const getFirstIndexValues = (emailTable: JobResults | null): string[] => {
-  if (!emailTable) return [];
-  return Object.values(emailTable).map((detail) =>
-    detail.content.length > 0 ? detail.content[0] : ""
-  );
-};
-
-/** Updates spreadsheet data using the Sheets API */
-const updateSpreadsheetData = async (
-  token: string,
-  spreadsheetId: string,
-  values: string[]
-): Promise<Response | null> => {
-  try {
-    const requestBody = {
-      valueInputOption: "USER_ENTERED",
-      data: [
-        {
-          range: "A1:E1",
-          majorDimension: "ROWS",
-          values: [values],
-        },
-      ],
-      includeValuesInResponse: false,
-      responseValueRenderOption: "FORMATTED_VALUE",
-      responseDateTimeRenderOption: "SERIAL_NUMBER",
-    };
-
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchUpdate`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(requestBody),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return response;
-  } catch (error: any) {
-    console.error("Error updating spreadsheet:", error);
-    return null;
-  }
-};
-
-/** Creates a new spreadsheet via the Sheets API */
-const createNewSpreadsheet = async (
-  token: string
-): Promise<SpreadSheet | null> => {
-  try {
-    const requestBody = { properties: { title: "JobHunting" } };
-    const response = await fetch("https://sheets.googleapis.com/v4/spreadsheets", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error: any) {
-    console.error("Error creating spreadsheet:", error);
-    return null;
-  }
-};
-
-/** Calls your backend to generate a table from email details */
-const generateTableRequest = async (
-  emailDetails: String[]
-): Promise<JobResults | null> => {
-  try {
-    const queryParam = encodeURIComponent(emailDetails.join(" "));
-    const url = `http://127.0.0.1:8080/company/company-job-info-crew-ai?email=${queryParam}`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const jsonData = await response.json();
-    const parsedData = jsonData as JobInfoResponse;
-    console.log("Career Table Data:", parsedData);
-    return parsedData.data.results;
-  } catch (err) {
-    console.error("Error fetching career data:", err);
-    return null;
-  }
-};
-
-/* ======================================================
-   GMAIL API CALLS & EMAIL HANDLING
-====================================================== */
-
 /** Extracts the email ID from the open email's DOM or URL */
 const getEmailIdFromDOM = (): string | null => {
   const emailElement = document.querySelector("[data-legacy-message-id]");
@@ -168,38 +57,42 @@ const getEmailIdFromDOM = (): string | null => {
  * to update your spreadsheet.
  */
 const handleFetchEmail = async (emailId: string) => {
-  try {
-    const token = await getAuthToken();
-    const emailDetailsResponse = await fetch(
-      `https://gmail.googleapis.com/gmail/v1/users/me/messages/${emailId}?format=full`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    const emailData = await emailDetailsResponse.json();
-    console.log("Email Details:", emailData);
-
-    const emailDetails = parseEmailParts(emailData.payload.parts);
-    console.log("Parsed Email Details:", emailDetails);
-
-    const emailTable = await generateTableRequest(emailDetails);
-    console.log("Email Table:", emailTable);
-    const spreadsheetCreationResponse = await createNewSpreadsheet(token);
-    console.log("Spread Sheet Creation Response:", spreadsheetCreationResponse);
-
-    // Use a local variable since content scripts don't require React state
-    const spreadSheetId = (spreadsheetCreationResponse as SpreadSheet)?.spreadsheetId;
-    console.log("SPREAD SHEET ID", spreadSheetId)
-    if (!spreadSheetId) {
-      console.error("Spreadsheet ID not available");
-      return;
+    try {
+      const token = await getAuthToken();
+      
+      // Fetch the full email details from Gmail
+      const emailDetailsResponse = await fetch(
+        `https://gmail.googleapis.com/gmail/v1/users/me/messages/${emailId}?format=full`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const emailData = await emailDetailsResponse.json();
+      console.log("Email Details:", emailData);
+  
+      // Parse email parts using your helper
+      const emailDetails = parseEmailParts(emailData.payload.parts);
+      console.log("Parsed Email Details:", emailDetails);
+  
+      // Convert the array of email details into a single string
+      const emailContent = emailDetails.join(" ");
+      const encodedEmailContent = encodeURIComponent(emailContent);
+  
+      // Call your backend endpoint passing both the email and token as query parameters
+      const apiResponse = await fetch(
+        `http://127.0.0.1:8080/company/company-job-info-crew-ai?email=${encodedEmailContent}&token=${token}`,
+        { method: "POST" }
+      );
+  
+      if (!apiResponse.ok) {
+        throw new Error(`Backend error: ${apiResponse.status}`);
+      }
+  
+      const responseData = await apiResponse.json();
+      console.log("Response from backend:", responseData);
+    } catch (error: any) {
+      console.error("Error fetching email summary:", error.message);
     }
-    const values = getFirstIndexValues(emailTable);
-    console.log("THESE ARE THE VALUES", values)
-    const updateSpreadSheetResponse = await updateSpreadsheetData(token, spreadSheetId, values);
-    console.log("UPDATE SPREASHEET RESPONSE", updateSpreadSheetResponse)
-  } catch (error: any) {
-    console.error("Error fetching email summary:", error.message);
-  }
-};
+  };
+  
 
 /* ======================================================
    DOM INJECTION
