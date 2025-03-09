@@ -4,13 +4,14 @@ from services.clients.crew_client import TableMakerCrew
 from config.keys import PERPLEXITY_API_KEY
 import json
 from models.create_table import JobInformation
-from models.email_summary import GPT_Email_Summary_Response
+from models.email_summary import GPT_Email_Summary_Response, Status
 from utils.helpers import string_to_json
-from services.summary.email_summary import email_summary
+from services.summary import email_summary_service
 from services.memory import memo_service
-import asyncio
+from services.summary  import crewai_table_service
+from services.user  import user_service
 # set up logger 
-router = APIRouter()
+router = APIRouter() 
 
 
 
@@ -19,7 +20,7 @@ router = APIRouter()
 
 @router.get("/email-summary")
 async def get_summary_email(email: str):
-    return email_summary(email)
+    return email_summary_service.email_summary(email)
 
 
 
@@ -112,37 +113,71 @@ async def get_company_job_info(company: str, job_position: str):
 
 
 
-@router.get("/company-job-info-crew-ai")
-async def get_company_job_info(email:str):
-    summary_json:GPT_Email_Summary_Response = email_summary(email)
+# async def get_cache_response(query_key):
+#     print("EXISTS")
+#     response_dict = await memo_service.get_response_for_query(query_key)
+#     try:
+#         response_format = JobInformation(**response_dict)
+#     except Exception as e:
+#         print("ERROR RESPONSE", e)
+#         raise HTTPException(status_code=500, detail="Response validation failed")
+#     return response_format
+
+
+@router.get("/company-job-info-crew-ai/")
+async def get_company_job_info(user_id:str, email:str):
+    summary_json:GPT_Email_Summary_Response = email_summary_service.email_summary(email)
+    match(summary_json.status): 
+        case Status.IN_REVIEW | Status.INTERVIEWING:
+            query_key = summary_json.company+summary_json.job_position
+            if await memo_service.query_exists(query_key):
+                response_dict = await memo_service.get_response_for_query(query_key)
+                try:
+                    response_format = JobInformation(**response_dict)
+                except Exception as e:
+                    print("ERROR RESPONSE", e)
+                    raise HTTPException(status_code=500, detail="Response validation failed")
+            else: 
+                inputs = {
+                    'company': summary_json.company,
+                    'job': summary_json.job_position,
+                    'summary': summary_json.summary,
+                    "status": str(summary_json.status)
+                }
+                try:
+                    response_format = await crewai_table_service.crewai_table(query_key=query_key, inputs=inputs)
+                except Exception as e:
+                    raise HTTPException(status_code=500, detail="Response validation failed")
+
+           
+            user_service_response = await user_service.get_user_excel_from_db(user_id=user_id)
+            if user_service_response is None:
+                row = 1
+                # TODO: create google sheet in this case
+                google_sheet_id  = 123
+                await user_service.save_user_info_to_db(user_id=user_id,
+                                                        current_sheet_row=1, 
+                                                        excel_id=google_sheet_id)
+            else :
+                print(user_service_response)
+                row  = user_service_response["current_sheet_row"]
+                excel_id = user_service_response["excel_id"]
+
+                
+
+            #TODO: UPDATE GOOGLE SHEET via Google Sheets 
+
+            # TODO: UPDATE DB WITH NEW ROW 
+            await user_service.update_user_row(user_id=user_id,
+                                               current_sheet_row=row+1)
+        case Status.OFFER | Status.REJECTED:
+            return " UPDATE DATABASE"
+        case _:
+            raise HTTPException(status_code=500, detail="Response validation failed")
+
+        
+        
+
+        
+
     
-    query_key = summary_json.company+summary_json.job_position
-    inputs = {
-        'company': summary_json.company,
-        'job': summary_json.job_position,
-        'summary': summary_json.summary,
-        "status": str(summary_json.status)
-    }
-
-    if await memo_service.query_exists(query_key):
-        print("EXISTS")
-        response_dict = await memo_service.get_response_for_query(query_key)
-        try:
-            response_format = JobInformation(**response_dict)
-        except Exception as e:
-            print("ERROR RESPONSE", e)
-            raise HTTPException(status_code=500, detail="Response validation failed")
-    else:
-        result = await asyncio.to_thread(TableMakerCrew().crew().kickoff, inputs) 
-        await memo_service.save_query_response(query_key, result.json_dict)
-        print("INSERTING")
-
-        try:
-            print(result.json_dict)
-            response_format = JobInformation(**result.json_dict)
-        except Exception as e:
-            
-            print("ERROR RESPONSE", e)
-            raise HTTPException(status_code=500, detail="Response validation failed")
-
-    return {"data": response_format}
