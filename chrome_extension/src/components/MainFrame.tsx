@@ -15,8 +15,151 @@ type SpreadSheet = {
   spreadsheetId: string
 }
 
+export enum StatusEnum {
+  Validated = "Validated",
+  NeedsWork = "Needs Work",
+}
+
+export interface JobResults {
+  job_description: JobDetail;
+  pay_range: JobDetail;
+  interview_process: JobDetail;
+  example_interview_experience: JobDetail;
+}
+
+export interface JobDetail {
+  status: StatusEnum; // Define valid statuses
+  content: String[];
+  source: String[];
+}
+
+export interface JobInfoResponse {
+  data: {
+      company: string;
+      results: JobResults;
+  };
+}
+
+
+const getFirstIndexValues = (emailTable: JobResults | null): string[] => {
+  if (!emailTable) return [];
+
+  const firstIndexValues: string[] = [];
+
+  for (const value of Object.values(emailTable)) {
+      if (value.content.length > 0) {
+          firstIndexValues.push(value.content[0]); // Get first index of each field
+      } else {
+          firstIndexValues.push(""); // Placeholder if content is empty
+      }
+  }
+
+  return firstIndexValues;
+};
+
+
+const generateTableRequest = async (emailDetails: String[]): Promise<JobResults | null> => {
+  try {
+      const queryParam = encodeURIComponent(emailDetails.join(" "));
+      const url = `http://127.0.0.1:8080/company/company-job-info-crew-ai?email=${queryParam}`;
+
+      const response = await fetch(url, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json"
+          }
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const jsonData = await response.json();
+
+      // Type assertion with validation
+      const parsedData = jsonData as JobInfoResponse;
+
+      console.log("Career Table Data:", parsedData);
+
+      return parsedData.data.results; // Return the extracted `JobResults` object
+  } catch (err) {
+      console.error("Error fetching career data:", err);
+      return null;
+  }
+};
+
+
+const createNewSpreadsheet = async (token: string): Promise<SpreadSheet | null> => {
+  try {
+      const requestBody = {
+          properties: { title: "JobHunting" }
+      };
+
+      const response = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      return await response.json(); // Returns the parsed spreadsheet object
+  } catch (error: any) {
+      console.error("Error creating spreadsheet:", error);
+      // setError(error.message);
+      return null;
+  }
+};
+
+const updateSpreadsheetData = async (token: string, spreadsheetId: String, values:String[]): Promise<Response | null> => {
+  try {
+      const requestBody = {
+          valueInputOption: "USER_ENTERED",
+          data: [
+              {
+                  range: "A1:D1",
+                  majorDimension: "ROWS",
+                  values: [values],
+              }
+          ],
+          includeValuesInResponse: false,
+          responseValueRenderOption: "FORMATTED_VALUE",
+          responseDateTimeRenderOption: "SERIAL_NUMBER"
+      };
+
+      const response = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchUpdate`,
+          {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify(requestBody)
+          }
+      );
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      return response;
+  } catch (error: any) {
+      console.error("Error updating spreadsheet:", error);
+      // setError(error.message);
+      return null;
+  }
+};
+
+
 function MainFrame() {
   const [emailSummaryData, setEmailSummaryData] = useState<String[]>([]);
+  const [careerTable, setCareerTable] = useState<JobResults | null>(null);
   const [spreadSheetId, setSpreadSheetID] = useState<String>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -46,26 +189,24 @@ function MainFrame() {
 
         const emailData = await emailDetailsResponses.json();
         console.log("Email Details: ", emailData);
-        const emailDetails = parseEmailParts(emailData.payload.parts);
+
+        const emailDetails = parseEmailParts(emailData.payload.parts) ;
         console.log(emailDetails);
 
 
-        const emailSummaryResponse = await fetch(
-          'http://127.0.0.1:8080/company/email-summary',
-          {
-            method: "POST",
-            headers: {
-             "Content-Type": 'application/json'
-            },
-            body: JSON.stringify({
-              content: emailDetails.join(" ")
-            })
-          }
-        );
-        const emailSummary = await emailSummaryResponse.json();
-        console.log("Email Summary:");
-        console.log(emailSummary);
-        setEmailSummaryData(emailSummary.data.content);
+        const emailTable = await generateTableRequest(emailDetails);
+        const spreadsheetCreationResponse = await createNewSpreadsheet(token);
+    
+        
+        setCareerTable(emailTable);
+        setSpreadSheetID((spreadsheetCreationResponse as SpreadSheet).spreadsheetId);
+        const values =  getFirstIndexValues(emailTable)
+        
+        
+        const updateSpreadSheetReponse = await updateSpreadsheetData(token, spreadSheetId, values)
+
+        console.log("Email Table:");
+        console.log(emailTable);
       }
     } catch (err: any) {
       setError(err.message);
@@ -74,29 +215,14 @@ function MainFrame() {
     }
   };
 
+
   const createSpreadsheet = async () => {
     setLoading(true);
     
     try {
       const token = await getAuthToken();
-      const spreadsheetCreationResponse = await fetch(
-        'https://sheets.googleapis.com/v4/spreadsheets',
-        {
-          method: "POST",
-          headers: {
-           "Content-Type": 'application/json',
-           Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            properties: {
-              title: "JobHunting"
-            }
-          })
-        }
-      );     
-      const spreadSheetJson = await spreadsheetCreationResponse.json();
-      console.log(spreadSheetJson);
-      setSpreadSheetID((spreadSheetJson as SpreadSheet).spreadsheetId);
+      const spreadsheetCreationResponse = await createNewSpreadsheet(token);
+      setSpreadSheetID((spreadsheetCreationResponse as SpreadSheet).spreadsheetId);
       return spreadsheetCreationResponse;
     } catch (err) {
       // TODO (developer) - Handle exception
