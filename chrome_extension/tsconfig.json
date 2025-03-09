@@ -25,6 +25,5 @@
     "src"
   ],
   "exclude": [
-    "src/chrome"
   ]
 }
