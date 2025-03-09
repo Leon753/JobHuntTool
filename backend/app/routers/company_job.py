@@ -112,7 +112,7 @@ async def get_company_job_info(company: str, job_position: str):
 
 
 
-@router.get("/company-job-info-crew-ai/")
+@router.get("/company-job-info-crew-ai")
 async def get_company_job_info(email:str):
     summary_json:GPT_Email_Summary_Response = email_summary(email)
     
