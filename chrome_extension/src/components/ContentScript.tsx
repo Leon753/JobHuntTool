@@ -59,7 +59,7 @@ const updateSpreadsheetData = async (
       valueInputOption: "USER_ENTERED",
       data: [
         {
-          range: "A1:D1",
+          range: "A1:E1",
           majorDimension: "ROWS",
           values: [values],
         },
@@ -187,15 +187,15 @@ const handleFetchEmail = async (emailId: string) => {
 
     // Use a local variable since content scripts don't require React state
     const spreadSheetId = (spreadsheetCreationResponse as SpreadSheet)?.spreadsheetId;
-    console.log(spreadSheetId)
+    console.log("SPREAD SHEET ID", spreadSheetId)
     if (!spreadSheetId) {
       console.error("Spreadsheet ID not available");
       return;
     }
     const values = getFirstIndexValues(emailTable);
-    console.log(values)
+    console.log("THESE ARE THE VALUES", values)
     const updateSpreadSheetResponse = await updateSpreadsheetData(token, spreadSheetId, values);
-    console.log(updateSpreadSheetResponse)
+    console.log("UPDATE SPREASHEET RESPONSE", updateSpreadSheetResponse)
   } catch (error: any) {
     console.error("Error fetching email summary:", error.message);
   }
