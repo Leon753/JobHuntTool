@@ -6,6 +6,13 @@ class ColumnResult(BaseModel):
     content: List[str]
     source: List[str]
 
+
+class Columns(BaseModel):
+    job_description: ColumnResult
+    pay_range: ColumnResult
+    interview_process: ColumnResult
+    example_interview_experience: ColumnResult
+
 class JobInformation(BaseModel):
     company: str
-    results: Dict[str, ColumnResult]
+    results: Columns
