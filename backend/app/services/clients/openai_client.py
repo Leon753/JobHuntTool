@@ -2,6 +2,7 @@
 from typing import List, Dict, AnyStr
 import requests
 from services.base.llm_client import LLMClientBase
+from services.clients.async_client import client
 import time
 import random
 import httpx 
@@ -40,7 +41,6 @@ class AzureAIClient(LLMClientBase):
             
 
     async def async_api_call(self, **kwargs) -> Dict:
-        async with httpx.AsyncClient() as client:  # Ensures proper connection management
             for attempt in range(self.max_retries):
                 try:
                     response = await client.post(self.uri, headers=self.headers, json=kwargs["payload"])
