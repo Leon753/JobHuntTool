@@ -114,15 +114,7 @@ async def get_company_job_info(company: str, job_position: str):
 
 
 
-# async def get_cache_response(query_key):
-#     print("EXISTS")
-#     response_dict = await memo_service.get_response_for_query(query_key)
-#     try:
-#         response_format = JobInformation(**response_dict)
-#     except Exception as e:
-#         print("ERROR RESPONSE", e)
-#         raise HTTPException(status_code=500, detail="Response validation failed")
-#     return response_format
+
 
 
 def get_columns_content_strings(columns: Columns) -> dict[str, str]:
@@ -170,7 +162,6 @@ async def get_company_job_info( payload:TableRowRequestPayload, authorization: s
             user_service_response = await user_service.get_user_excel_from_db(user_id=payload.user_id)
             if user_service_response is None:
                 row = 2
-                # TODO: create google sheet in this case
                 data = {
                     "properties": { "title": "BACKEND JobHuntingTest" }
                 }   
@@ -196,9 +187,8 @@ async def get_company_job_info( payload:TableRowRequestPayload, authorization: s
 
 
             content_strings = get_columns_content_strings(response_format.results)
-            #{'job_description': 'Design and maintain avionics hardware throughout the Dragon spacecraft’s lifecycle.\nTroubleshoot and analyze electronic assemblies during testing and operations.\nEnsure the design, manufacturability, and reliability meet rigorous safety standards.\nCollaborate with diverse engineering teams for continuous improvement.', 'pay_range': 'The estimated salary range for the Avionics Hardware Engineer position at SpaceX is $95,000–$130,000 per year, depending on experience and background.', 'interview_process': "The interview process typically includes 4–6 rounds.\nTechnical rounds focus on circuit design, schematics, debugging, and hands-on problem-solving.\nBehavioral rounds assess the candidate's ability to operate under high-pressure environments and collaborate across teams.\nThe overall interview process usually takes 2–4 weeks to complete.", 'example_interview_experience': 'Example: A candidate was asked to design a circuit during a technical round and was tasked with identifying potential failure points in an avionics system. They were also required to explain their design choices and discuss their previous experience using Altium and debugging tools. Behavioral questions included how they handled a high-stress technical failure on a previous project.'}
+
             row_values =  [""] * len(HEADER_NAMES)
-            # ["COMPANY", "JOB", "STATUS","JOB DESCRIPTION", "PAY RANGE", "INTERVIEW PROCESS", "EXAMPLE INTERVIEW EXPERIENCE"]
             row_values[HEADER_TO_INDEX["COMPANY"]] = summary_json.company
             row_values[HEADER_TO_INDEX["JOB"]] = summary_json.job_position
             row_values[HEADER_TO_INDEX["STATUS"]] = str(summary_json.status.name)
