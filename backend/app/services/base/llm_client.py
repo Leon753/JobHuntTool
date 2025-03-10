@@ -18,6 +18,9 @@ class LLMClientBase(ABC):
         pass
 
     @abstractmethod
+    async def call_async(self, **kwargs):
+        pass 
+    @abstractmethod
     def parse_response(self, **kwargs) ->List:
         pass
 
