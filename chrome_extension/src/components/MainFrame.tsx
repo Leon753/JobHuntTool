@@ -92,10 +92,10 @@ const generateTableRequest = async (emailDetails: String[]): Promise<JobResults 
 const createNewSpreadsheet = async (token: string): Promise<SpreadSheet | null> => {
   try {
       const requestBody = {
-          properties: { title: "JobHunting" }
+          properties: { title: "JobHuntingTest" }
       };
 
-      const response = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+      const response = await fetch('http://127.0.0.1:8080/google/create-spreadsheet', {
           method: "POST",
           headers: {
               "Content-Type": "application/json",
@@ -237,7 +237,7 @@ function MainFrame() {
     try {
       const token = await getAuthToken();
       const spreadsheetUpdateResponse = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchUpdate`,
+        'http://127.0.0.1:8080/google/update-spreadsheet',
         {
           method: "POST",
           headers: {
@@ -251,7 +251,7 @@ function MainFrame() {
                 range: "A1:B1",
                 majorDimension: "ROWS",
                 values: [
-                  ["hi","JobHunter"]
+                  ["hi","Hunters"]
                 ]
               }
             ],
