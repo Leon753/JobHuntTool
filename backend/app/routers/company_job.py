@@ -19,7 +19,7 @@ router = APIRouter()
 
 @router.get("/email-summary")
 async def get_summary_email(email: str):
-    return email_summary(email)
+    return await email_summary(email)
 
 
 
@@ -114,7 +114,7 @@ async def get_company_job_info(company: str, job_position: str):
 
 @router.get("/company-job-info-crew-ai")
 async def get_company_job_info(email:str):
-    summary_json:GPT_Email_Summary_Response = email_summary(email)
+    summary_json:GPT_Email_Summary_Response = await email_summary(email)
     
     query_key = summary_json.company+summary_json.job_position
     inputs = {
