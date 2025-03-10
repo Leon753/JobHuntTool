@@ -1,8 +1,7 @@
 from services.clients.async_client import client
 
-async def createSheet(headers: dict, body: dict) -> dict:
+async def createSheet(auth_header: dict, body: dict) -> dict:
     try:
-        auth_header = headers.get("authorization")
         if not auth_header:
             raise ValueError("Missing authorization header")
         
@@ -21,9 +20,8 @@ async def createSheet(headers: dict, body: dict) -> dict:
         print(f"An error occurred: {error}")
         return {"error": str(error)}
 
-async def updateSheet(headers: dict, body: dict, spreadsheetId: str) -> dict:
+async def updateSheet(auth_header: dict, body: dict, spreadsheetId: str) -> dict:
     try:
-        auth_header = headers.get("authorization")
         if not auth_header:
             raise ValueError("Missing authorization header")
         
@@ -41,16 +39,3 @@ async def updateSheet(headers: dict, body: dict, spreadsheetId: str) -> dict:
         print(f"An error occurred: {error}")
         return {"error": str(error)}
 
-google_sheet =  {
-            "valueInputOption": "USER_ENTERED",
-            "data": [],
-            "includeValuesInResponse": "false",
-            "responseValueRenderOption": "FORMATTED_VALUE",
-            "responseDateTimeRenderOption": "SERIAL_NUMBER"
-          }
-
-data_index =  {
-                "range": "",
-                "majorDimension": "ROWS",
-                "values": []
-            }
