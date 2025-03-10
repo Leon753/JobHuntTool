@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from services.clients.perplexity_client import PerplexityClient 
 from services.clients.crew_client import TableMakerCrew
 from config.keys import PERPLEXITY_API_KEY
@@ -20,7 +20,7 @@ router = APIRouter()
 
 @router.get("/email-summary")
 async def get_summary_email(email: str):
-    return email_summary_service.email_summary(email)
+    return await email_summary_service.email_summary(email)
 
 
 
@@ -126,7 +126,7 @@ async def get_company_job_info(company: str, job_position: str):
 
 @router.get("/company-job-info-crew-ai/")
 async def get_company_job_info(user_id:str, email:str):
-    summary_json:GPT_Email_Summary_Response = email_summary_service.email_summary(email)
+    summary_json:GPT_Email_Summary_Response = await email_summary_service.email_summary(email)
     match(summary_json.status): 
         case Status.IN_REVIEW | Status.INTERVIEWING:
             query_key = summary_json.company+summary_json.job_position
@@ -159,7 +159,7 @@ async def get_company_job_info(user_id:str, email:str):
                                                         current_sheet_row=1, 
                                                         excel_id=google_sheet_id)
             else :
-                print(user_service_response)
+               
                 row  = user_service_response["current_sheet_row"]
                 excel_id = user_service_response["excel_id"]
 
@@ -168,6 +168,11 @@ async def get_company_job_info(user_id:str, email:str):
             #TODO: UPDATE GOOGLE SHEET via Google Sheets 
 
             # TODO: UPDATE DB WITH NEW ROW 
+
+            # await user_service.save_excel_job_row_to_db(user_id=user_id, 
+            #                                             company=summary_json.company,
+            #                                             position=summary_json.job_position,
+            #                                             sheet_row= row)
             await user_service.update_user_row(user_id=user_id,
                                                current_sheet_row=row+1)
         case Status.OFFER | Status.REJECTED:

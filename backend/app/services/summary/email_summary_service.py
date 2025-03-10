@@ -5,7 +5,7 @@ import json
 from schemas.email_schema import email_schema
 from utils.helpers import string_to_json
 
-def email_summary(email:str) -> GPT_Email_Summary_Response:
+async def email_summary(email:str) -> GPT_Email_Summary_Response:
 
     query  = f"""
             Provide a summary of the email and also extract the job and company from the email. 
@@ -42,14 +42,14 @@ def email_summary(email:str) -> GPT_Email_Summary_Response:
                                           deployment_name=CHAT_DEPLOYMENT_NAME)
     response_format = {
             "type": "json_schema",
-        "json_schema": {"name": "email_schema", "schema": email_schema}
+        "json_schema": {"name": "email_schema", "schema": GPT_Email_Summary_Response.model_json_schema()}
     }
     
-    chat_response = chat_client.call(messages=messages, response_format=None)
+    chat_response = await chat_client.call_async(messages=messages, response_format=response_format)
     msgs = chat_client.parse_response(chat_response)
     try: 
-        msg  =  string_to_json(msgs[-1])
-        response = json.loads(msg)
+        # msg  =  string_to_json(msgs[-1])
+        response = json.loads(msgs[-1])
     except Exception as e:
         print("ERROR RESPONSE", e)
         raise SyntaxError("Response validation failed")

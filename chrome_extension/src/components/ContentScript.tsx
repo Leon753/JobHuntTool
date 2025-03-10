@@ -171,7 +171,7 @@ const handleFetchEmail = async (emailId: string) => {
   try {
     const token = await getAuthToken();
     const emailDetailsResponse = await fetch(
-      `https://gmail.googleapis.com/gmail/v1/users/me/messages/${emailId}?format=full`,
+      `http://127.0.0.1:8080/google/get-email/${emailId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     const emailData = await emailDetailsResponse.json();

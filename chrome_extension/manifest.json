@@ -33,7 +33,7 @@
       "default_title": "Job Hunter"
     },
     "oauth2": {
-      "client_id": "",
+      "client_id": "285496474323-bdblk51g4kn6ula3ovaubcnvlpd94ktc.apps.googleusercontent.com",
       "scopes": [
         "https://www.googleapis.com/auth/gmail.readonly",
         "https://www.googleapis.com/auth/userinfo.email",
