@@ -32,10 +32,11 @@ async def updateSpreadsheet(req: Request):
     try:
         data = await req.json()
         # hardcoding spreadsheetid for now
-        res = await updateSheet(req.headers, data, "1p_NpdRVzrZ6V51ZN3WJbvVvW8wZI-rabOLEiyyD4_dw")
+        res = await updateSheet(req.headers, data, "1Dq7HHGUnfPvaHWp3fNH7G9b63xZoFuHlvGxaV64Sgjg")
         success = {"status": "success"}
         success.update(res)
         return success
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
+
