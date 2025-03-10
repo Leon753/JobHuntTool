@@ -1,6 +1,6 @@
-import requests
+from services.clients.async_client import client
 
-def getEmail(headers: dict, emailId: str):
+async def getEmail(headers: dict, emailId: str):
     try:
         auth_header = headers.get("authorization")
         if not auth_header:
@@ -10,9 +10,9 @@ def getEmail(headers: dict, emailId: str):
             "Authorization": auth_header,
             "Content-Type": "application/json",
         }
-        response = requests.get(f'https://gmail.googleapis.com/gmail/v1/users/me/messages/{emailId}?format=full', headers=headerValues)
+        response = await client.get(f'https://gmail.googleapis.com/gmail/v1/users/me/messages/{emailId}?format=full', headers=headerValues)
         if response.status_code == 200:
             return response.json()
-    except requests.exceptions.HTTPError as error:
+    except Exception as error:
         print(f"An error occurred: {error}")
         return error

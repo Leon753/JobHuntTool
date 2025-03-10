@@ -7,7 +7,7 @@ router = APIRouter()
 @router.get("/get-email/{emailId}")
 async def getEmailId(req: Request, emailId: str):
     try:
-        res = getEmail(req.headers, emailId)
+        res = await getEmail(req.headers, emailId)
         success = {"status": "success"}
         success.update(res)
         return success
@@ -18,7 +18,7 @@ async def getEmailId(req: Request, emailId: str):
 async def createSpreadsheet(req: Request):
     try:
         data = await req.json()
-        res = createSheet(req.headers, data)
+        res = await createSheet(req.headers, data)
         success = {"status": "success"}
         success.update(res)
         return success
@@ -32,7 +32,7 @@ async def updateSpreadsheet(req: Request):
     try:
         data = await req.json()
         # hardcoding spreadsheetid for now
-        res = updateSheet(req.headers, data, "1p_NpdRVzrZ6V51ZN3WJbvVvW8wZI-rabOLEiyyD4_dw")
+        res = await updateSheet(req.headers, data, "1p_NpdRVzrZ6V51ZN3WJbvVvW8wZI-rabOLEiyyD4_dw")
         success = {"status": "success"}
         success.update(res)
         return success
