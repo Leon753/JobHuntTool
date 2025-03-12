@@ -5,6 +5,16 @@ import { parseEmailParts } from "../helpers/helperFn";
 import CircularProgress from '@mui/material/CircularProgress';
 import { Button } from "@mui/material";
 
+const email_content = `Hi Mohammad Amin,
+
+Thanks for your interest in the Avionics Hardware Engineer (Dragon) position at SpaceX. I have reviewed your resume and would like to arrange time for us to talk so I can learn more about your experience and interest in working at SpaceX.
+
+To help schedule our call, select the "Enter your availability now" link at the very bottom of this email and block out several dates and times that you are available. The call will take about 30 minutes. Please note that times are displayed in your local time zone. Once I receive your response, I will confirm a time that works for both of us for the call.
+
+Let me know if you have any questions. I look forward to hearing from you!
+
+Thank you,`;
+
 interface Props {}
 
 type Email = {
@@ -230,7 +240,7 @@ function MainFrame() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const updateSpreadSheet = async (spreadsheetId: String) => {
     setLoading(true);
@@ -257,7 +267,8 @@ function MainFrame() {
             ],
             includeValuesInResponse: false,
             responseValueRenderOption: "FORMATTED_VALUE",
-            responseDateTimeRenderOption: "SERIAL_NUMBER"
+            responseDateTimeRenderOption: "SERIAL_NUMBER", 
+            
           })
         }
       )
@@ -267,15 +278,49 @@ function MainFrame() {
       throw err;
     } finally {
       setLoading(false);
-    }
+    };
   }
+  const testEndPoint = async () => {
+    setLoading(true);
+    try {
+      const token = await getAuthToken();
+  
+      // Build the payload using default/empty values for user_id and email_content
+      const payload = {
+        user_id: "123", // No value passed in
+        email_content: email_content, // No value passed in
+        
+      };
+  
+      const spreadsheetUpdateResponse = await fetch(
+        'http://127.0.0.1:8080/company/company-job-info-crew-ai',
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        }
+      );
+  
+      console.log(spreadsheetUpdateResponse.status);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
       <div>Hello. Let's start by fetching your emails</div>
       <Button onClick={fetchEmails}>Fetch Emails</Button>
       <Button onClick={createSpreadsheet}>Create Spreadsheet</Button>
+      <Button onClick={testEndPoint}>Test Endpoint</Button>
       <Button onClick={() => updateSpreadSheet(spreadSheetId)}>Update Spreadsheet</Button>
+      
       <>
       {
         loading ? 
