@@ -18,7 +18,7 @@ async def getEmailId(req: Request, emailId: str):
 async def createSpreadsheet(req: Request):
     try:
         data = await req.json()
-        res = await createSheet(req.headers, data)
+        res = await createSheet(req.headers.get("authorization"), data)
         success = {"status": "success"}
         success.update(res)
         return success
@@ -32,7 +32,7 @@ async def updateSpreadsheet(req: Request):
     try:
         data = await req.json()
         # hardcoding spreadsheetid for now
-        res = await updateSheet(req.headers, data, "1Dq7HHGUnfPvaHWp3fNH7G9b63xZoFuHlvGxaV64Sgjg")
+        res = await updateSheet(req.headers.get("authorization"), data, "1Dq7HHGUnfPvaHWp3fNH7G9b63xZoFuHlvGxaV64Sgjg")
         success = {"status": "success"}
         success.update(res)
         return success

@@ -289,13 +289,7 @@ function MainFrame() {
       const payload = {
         user_id: "123", // No value passed in
         email_content: email_content, // No value passed in
-        sheets_data: {
-          valueInputOption: "USER_ENTERED",
-          data: [],
-          includeValuesInResponse: false,
-          responseValueRenderOption: "FORMATTED_VALUE",
-          responseDateTimeRenderOption: "SERIAL_NUMBER"
-        }
+        
       };
   
       const spreadsheetUpdateResponse = await fetch(

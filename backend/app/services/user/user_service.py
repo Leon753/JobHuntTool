@@ -71,4 +71,13 @@ async def get_excel_job_row_from_db(user_id:str, company:str, position:str):
             if row is None:
                 return None
             return row
-        
+
+async def does_excel_job_exist(user_id: str, company: str, position: str) -> bool:
+    async with aiosqlite.connect(DATABASE) as db:
+        async with db.execute(
+            "SELECT EXISTS(SELECT 1 FROM user_jobs WHERE user_id = ? AND company = ? AND position = ?)",
+            (user_id, company, position)
+        ) as cursor:
+            exists_value = await cursor.fetchone()
+            # The EXISTS function returns 1 if the row exists, 0 otherwise.
+            return bool(exists_value[0])

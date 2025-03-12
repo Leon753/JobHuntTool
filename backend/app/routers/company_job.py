@@ -175,40 +175,48 @@ async def get_company_job_info( payload:TableRowRequestPayload, authorization: s
                 row  = user_service_response["current_sheet_row"]
                 excel_id = user_service_response["excel_id"]
 
-                
-            #TODO: UPDATE GOOGLE SHEET via Google Sheets &  # TODO: UPDATE DB WITH NEW ROW 
-            sheets_data:GoogleSheetsData = payload.sheets_data
+            sheets_data = {
+                "valueInputOption": "USER_ENTERED",
+                "data": [],
+                "includeValuesInResponse": "false",
+                "responseValueRenderOption": "FORMATTED_VALUE",
+                "responseDateTimeRenderOption": "SERIAL_NUMBER"
+            }
             if row == 2:
-                values = [HEADER_NAMES]
-                headerDataItem  = DataItem(range=f"{HEADER_COLUMNS[0]}1:{HEADER_COLUMNS[-1]}1",
-                                           majorDimension="ROWS",
-                                           values=values)
-                sheets_data.data.append(headerDataItem)
+                headerDataItem = {
+                        "range": f"{HEADER_COLUMNS[0]}1:{HEADER_COLUMNS[-1]}1",
+                        "majorDimension": "ROWS",
+                        "values": [HEADER_NAMES]
+                    }
+                sheets_data["data"].append(headerDataItem)
 
 
             content_strings = get_columns_content_strings(response_format.results)
+            row_values = [
+                summary_json.company,           
+                summary_json.job_position,      
+                str(summary_json.status.name),  
+                content_strings["job_description"],
+                content_strings["pay_range"],
+                content_strings["interview_process"],
+                content_strings["example_interview_experience"]
+            ]
 
-            row_values =  [""] * len(HEADER_NAMES)
-            row_values[HEADER_TO_INDEX["COMPANY"]] = summary_json.company
-            row_values[HEADER_TO_INDEX["JOB"]] = summary_json.job_position
-            row_values[HEADER_TO_INDEX["STATUS"]] = str(summary_json.status.name)
-            row_values[HEADER_TO_INDEX["JOB DESCRIPTION"]] = content_strings["job_description"]
-            row_values[HEADER_TO_INDEX["PAY RANGE"]] = content_strings["pay_range"]
-            row_values[HEADER_TO_INDEX["INTERVIEW PROCESS"]] = content_strings["interview_process"]
-            row_values[HEADER_TO_INDEX["EXAMPLE INTERVIEW EXPERIENCE"]] = content_strings["example_interview_experience"]
-
-            rowDataItem = DataItem(range=f"{HEADER_COLUMNS[0]}{row}:{HEADER_COLUMNS[-1]}{row}",
-                                   majorDimension="ROWS",
-                                   values=[row_values])
-            sheets_data.data.append(rowDataItem)
             
-            res = await sheets.updateSheet(authorization, sheets_data.model_dump(), excel_id)
+            rowDataItem = {
+                "range": f"{HEADER_COLUMNS[0]}{row}:{HEADER_COLUMNS[-1]}{row}",
+                "majorDimension": "ROWS",
+                "values": [row_values]
+            }
+            sheets_data["data"].append(rowDataItem)
+            
+            res = await sheets.updateSheet(authorization, sheets_data, excel_id)
             await user_service.update_user_row(user_id=payload.user_id, current_sheet_row=row+1)
 
-            # await user_service.save_excel_job_row_to_db(user_id=user_id, 
-            #                                             company=summary_json.company,
-            #                                             position=summary_json.job_position,
-            #                                             sheet_row= row)
+            await user_service.save_excel_job_row_to_db(user_id=payload.user_id, 
+                                                        company=summary_json.company,
+                                                        position=summary_json.job_position,
+                                                        sheet_row= row)
 
             
         case Status.OFFER | Status.REJECTED:
