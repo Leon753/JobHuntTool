@@ -213,11 +213,6 @@ async def get_company_job_info( payload:TableRowRequestPayload, authorization: s
             res = await sheets.updateSheet(authorization, sheets_data, excel_id)
             await user_service.update_user_row(user_id=payload.user_id, current_sheet_row=row+1)
 
-            await user_service.save_excel_job_row_to_db(user_id=payload.user_id, 
-                                                        company=summary_json.company,
-                                                        position=summary_json.job_position,
-                                                        sheet_row= row)
-
             
         case Status.OFFER | Status.REJECTED:
             return " UPDATE DATABASE"
