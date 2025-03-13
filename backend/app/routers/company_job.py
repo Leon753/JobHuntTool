@@ -134,6 +134,8 @@ def get_columns_content_strings(columns: Columns) -> dict[str, str]:
 
 @router.post("/company-job-info-crew-ai/")
 async def get_company_job_info( payload:TableRowRequestPayload, authorization: str = Header(...) ):
+    print("PAYLOAD", payload)
+    print("authorization", authorization)
     summary_json:GPT_Email_Summary_Response = await email_summary_service.email_summary(payload.email_content)
 
     match(summary_json.status): 
