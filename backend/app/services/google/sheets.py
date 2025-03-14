@@ -1,6 +1,6 @@
 from services.clients.async_client import client
 
-async def createSheet(auth_header: dict, body: dict) -> dict:
+async def createSheet(auth_header: str, body: dict) -> dict:
     try:
         if not auth_header:
             raise ValueError("Missing authorization header")
@@ -20,7 +20,7 @@ async def createSheet(auth_header: dict, body: dict) -> dict:
         print(f"An error occurred: {error}")
         return {"error": str(error)}
 
-async def updateSheet(auth_header: dict, body: dict, spreadsheetId: str) -> dict:
+async def updateSheet(auth_header: str, body: dict, spreadsheetId: str) -> dict:
     try:
         if not auth_header:
             raise ValueError("Missing authorization header")

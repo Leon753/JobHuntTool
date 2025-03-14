@@ -1,13 +1,9 @@
 from services.clients.async_client import client
 
-async def getEmail(headers: dict, emailId: str):
+async def getEmail(headers: str, emailId: str):
     try:
-        auth_header = headers.get("authorization")
-        if not auth_header:
-            raise ValueError("Missing authorization header")
-        
         headerValues = {
-            "Authorization": auth_header,
+            "Authorization": headers,
             "Content-Type": "application/json",
         }
         response = await client.get(f'https://gmail.googleapis.com/gmail/v1/users/me/messages/{emailId}?format=full', headers=headerValues)
