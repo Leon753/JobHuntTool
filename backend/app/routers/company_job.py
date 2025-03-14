@@ -1,30 +1,24 @@
-from fastapi import APIRouter, HTTPException, Request, Header
+import json
+import base64
+from models.create_table import HEADER_COLUMNS, HEADER_NAMES, Columns, JobInformation
+from fastapi import APIRouter, HTTPException, Header, Body
 from services.clients.perplexity_client import PerplexityClient 
 from services.clients.crew_client import TableMakerCrew
 from config.keys import PERPLEXITY_API_KEY
-import json
-from models.create_table import *
 from models.email_summary import GPT_Email_Summary_Response, Status
 from utils.helpers import string_to_json
-from services.summary import email_summary_service
 from services.memory import memo_service
 from services.summary  import crewai_table_service
 from services.user  import user_service
-from services.google import email, sheets
+from services.google import sheets
+from services.summary import email_summary_service
+from services.google.email import getEmail 
 # set up logger 
 router = APIRouter() 
-
-
-
-
-
 
 @router.get("/email-summary")
 async def get_summary_email(email: str):
     return await email_summary_service.email_summary(email)
-
-
-
 
 @router.get("/company-job-info")
 async def get_company_job_info(company: str, job_position: str):
@@ -112,11 +106,6 @@ async def get_company_job_info(company: str, job_position: str):
 
     return response
 
-
-
-
-
-
 def get_columns_content_strings(columns: Columns) -> dict[str, str]:
     """
     Given a Columns instance, return a dictionary mapping each column field name to a single string.
@@ -132,11 +121,30 @@ def get_columns_content_strings(columns: Columns) -> dict[str, str]:
         result[column_name] = "\n".join(content_list)
     return result
 
-@router.post("/company-job-info-crew-ai/")
-async def get_company_job_info( payload:TableRowRequestPayload, authorization: str = Header(...) ):
-    print("PAYLOAD", payload)
-    print("authorization", authorization)
-    summary_json:GPT_Email_Summary_Response = await email_summary_service.email_summary(payload.email_content)
+
+def decode_email_parts(email_parts: list) -> list:
+    decoded_results = []
+    for part in email_parts:
+        # Extract the data from the part dictionary.
+        data = part.get('body', {}).get('data', '')
+        if data:
+            # Convert URL-safe Base64 to standard Base64.
+            b64 = data.replace('-', '+').replace('_', '/')
+            # Add missing padding if needed.
+            padding = len(b64) % 4
+            if padding:
+                b64 += '=' * (4 - padding)
+            # Decode the Base64 string into bytes, then decode to a UTF-8 string.
+            decoded_string = base64.b64decode(b64).decode('utf-8')
+            decoded_results.append(decoded_string)
+    return decoded_results
+
+@router.post("/company-job-info-crew-ai")
+async def get_company_job_info( email_id: str = Body(...), authorization: str = Header(...) ):
+    email_response = await getEmail(authorization, email_id)
+    results = decode_email_parts(email_response['payload']['parts'])[0]
+    user_id = email_response['payload']['headers'][0]['value']
+    summary_json:GPT_Email_Summary_Response = await email_summary_service.email_summary(results)
 
     match(summary_json.status): 
         case Status.IN_REVIEW | Status.INTERVIEWING:
@@ -161,15 +169,16 @@ async def get_company_job_info( payload:TableRowRequestPayload, authorization: s
                     raise HTTPException(status_code=500, detail="Response validation failed")
 
            
-            user_service_response = await user_service.get_user_excel_from_db(user_id=payload.user_id)
+            user_service_response = await user_service.get_user_excel_from_db(user_id=user_id)
             if user_service_response is None:
                 row = 2
                 data = {
                     "properties": { "title": "BACKEND JobHuntingTest" }
                 }   
                 res = await sheets.createSheet(authorization, data)
+                print(res)
                 excel_id = res['spreadsheetId']
-                await user_service.save_user_info_to_db(user_id=payload.user_id,
+                await user_service.save_user_info_to_db(user_id=user_id,
                                                         current_sheet_row=1, 
                                                         excel_id=res['spreadsheetId'])
             else :
@@ -213,17 +222,10 @@ async def get_company_job_info( payload:TableRowRequestPayload, authorization: s
             sheets_data["data"].append(rowDataItem)
             
             res = await sheets.updateSheet(authorization, sheets_data, excel_id)
-            await user_service.update_user_row(user_id=payload.user_id, current_sheet_row=row+1)
+            await user_service.update_user_row(user_id=user_id, current_sheet_row=row+1)
 
             
         case Status.OFFER | Status.REJECTED:
             return " UPDATE DATABASE"
         case _:
             raise HTTPException(status_code=500, detail="Response validation failed")
-
-        
-        
-
-        
-
-    
