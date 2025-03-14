@@ -1,12 +1,10 @@
 import json
-import base64
-from models.create_table import HEADER_COLUMNS, HEADER_NAMES, Columns, JobInformation
+from models.create_table import HEADER_COLUMNS, HEADER_NAMES, JobInformation
 from fastapi import APIRouter, HTTPException, Header, Body
 from services.clients.perplexity_client import PerplexityClient 
-from services.clients.crew_client import TableMakerCrew
 from config.keys import PERPLEXITY_API_KEY
 from models.email_summary import GPT_Email_Summary_Response, Status
-from utils.helpers import string_to_json
+from utils.helpers import decode_email_parts, get_columns_content_strings, string_to_json
 from services.memory import memo_service
 from services.summary  import crewai_table_service
 from services.user  import user_service
@@ -82,7 +80,7 @@ async def get_company_job_info(company: str, job_position: str):
                 query
             ),
         },
-    ]       
+    ]
     response_format = {
 		    "type": "json_schema",
         "json_schema": {"schema": JobInformation.model_json_schema()}
@@ -91,7 +89,7 @@ async def get_company_job_info(company: str, job_position: str):
                                        api_url="https://api.perplexity.ai/chat/completions", 
                                        model="sonar")
     response = await prelixty_client.get_response(messages=messages, response_format=response_format)
-    
+
     try:
         response = json.loads(string_to_json(response))
     except Exception as e:
@@ -105,39 +103,6 @@ async def get_company_job_info(company: str, job_position: str):
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     return response
-
-def get_columns_content_strings(columns: Columns) -> dict[str, str]:
-    """
-    Given a Columns instance, return a dictionary mapping each column field name to a single string.
-    The string is constructed by joining the content list items with a newline character.
-    """
-    result = {}
-    # Convert the pydantic model to a dict for readability.
-    columns_data = columns.model_dump()
-    for column_name, data in columns_data.items():
-        # 'data' is a dict with keys: status, content, source.
-        # We join the items in the 'content' list.
-        content_list = data.get("content", [])
-        result[column_name] = "\n".join(content_list)
-    return result
-
-
-def decode_email_parts(email_parts: list) -> list:
-    decoded_results = []
-    for part in email_parts:
-        # Extract the data from the part dictionary.
-        data = part.get('body', {}).get('data', '')
-        if data:
-            # Convert URL-safe Base64 to standard Base64.
-            b64 = data.replace('-', '+').replace('_', '/')
-            # Add missing padding if needed.
-            padding = len(b64) % 4
-            if padding:
-                b64 += '=' * (4 - padding)
-            # Decode the Base64 string into bytes, then decode to a UTF-8 string.
-            decoded_string = base64.b64decode(b64).decode('utf-8')
-            decoded_results.append(decoded_string)
-    return decoded_results
 
 @router.post("/company-job-info-crew-ai")
 async def get_company_job_info( email_id: str = Body(...), authorization: str = Header(...) ):
@@ -167,7 +132,6 @@ async def get_company_job_info( email_id: str = Body(...), authorization: str = 
                     response_format:JobInformation = await crewai_table_service.crewai_table(query_key=query_key, inputs=inputs)
                 except Exception as e:
                     raise HTTPException(status_code=500, detail="Response validation failed")
-
            
             user_service_response = await user_service.get_user_excel_from_db(user_id=user_id)
             if user_service_response is None:
@@ -176,7 +140,6 @@ async def get_company_job_info( email_id: str = Body(...), authorization: str = 
                     "properties": { "title": "BACKEND JobHuntingTest" }
                 }   
                 res = await sheets.createSheet(authorization, data)
-                print(res)
                 excel_id = res['spreadsheetId']
                 await user_service.save_user_info_to_db(user_id=user_id,
                                                         current_sheet_row=1, 
