@@ -6,9 +6,6 @@ HEADER_COLUMNS = ["A", "B", "C", "D", "E", "F", "G"]
 HEADER_NAMES = ["COMPANY", "JOB", "STATUS","JOB DESCRIPTION", "PAY RANGE", "INTERVIEW PROCESS", "EXAMPLE INTERVIEW EXPERIENCE"]
 
 
-
-
-
 class DataItem(BaseModel):
     range: str
     majorDimension: str
