@@ -43,38 +43,111 @@ const getEmailIdFromDOM = (): string | null => {
    DOM INJECTION
 ====================================================== */
 
+const createButton = () => {
+  // Create button
+  const button = document.createElement('button');
+  button.id = "fetch-email-summary-button";
+  
+  // Add spinner
+  const spinner = document.createElement('span');
+  spinner.style.display = 'none';
+  spinner.style.width = '16px';
+  spinner.style.height = '16px';
+  spinner.style.border = '2px solid #ffffff';
+  spinner.style.borderTopColor = 'transparent';
+  spinner.style.borderRadius = '50%';
+  spinner.style.animation = 'spin 0.8s linear infinite';
+
+  // Add text container
+  const textSpan = document.createElement('span');
+  textSpan.textContent = 'Fetch Email Summary';
+  
+  // Add elements to button
+  button.appendChild(spinner);
+  button.appendChild(textSpan);
+
+  // Style the button
+  Object.assign(button.style, {
+      background: 'transparent',
+      color: '#4f46e5',
+      border: '1px solid #4f46e5',
+      padding: '6px 12px',
+      marginRight: '2em',
+      borderRadius: '8px',
+      fontSize: '12px',
+      fontWeight: '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px'
+  });
+
+  // Add hover effect
+  button.addEventListener('mouseover', () => {
+      button.style.background = '#4f46e5';
+      button.style.color = 'white';
+  });
+
+  button.addEventListener('mouseout', () => {
+      button.style.background = 'transparent';
+      button.style.color = '#4f46e5';
+  });
+
+  // Add click handler with loading state
+  button.addEventListener('click', async function(event) {
+      if (button.disabled) return;
+      // Store the current width before changing states
+      const buttonWidth = button.offsetWidth;
+      button.style.width = `${buttonWidth}px`;  
+
+      event.stopPropagation();
+      const emailId = getEmailIdFromDOM();
+      if (emailId) {
+        handleFetchEmail(emailId);
+      } else {
+        console.error("Email ID extraction failed.");
+      }
+      
+      button.disabled = true;
+      button.style.opacity = '0.7';
+      button.style.cursor = 'not-allowed';
+      spinner.style.display = 'inline-block';
+      textSpan.style.display = 'none';
+      
+      // Simulate API call
+      setTimeout(() => {
+          button.disabled = false;
+          button.style.opacity = '1';
+          button.style.cursor = 'pointer';
+          spinner.style.display = 'none';
+          textSpan.style.display = 'inline';
+          button.style.width = '';  // Reset to natural width
+      }, 1500);
+  });
+
+  // Add spinner animation
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = `
+      @keyframes spin {
+          to { transform: rotate(360deg); }
+      }
+  `;
+  return button;
+}
+
 /** Injects the "Fetch Email Summary" button after the email title */
 const injectButtonWhenEmailOpened = () => {
   // Gmail usually displays the subject in an h2 with class "hP"
-  const emailTitle = document.querySelector("h2.hP");
+  const emailTitle = document.querySelector("div.gK");
   if (emailTitle) {
     if (document.getElementById("fetch-email-summary-button")) {
       return;
     }
-    const button = document.createElement("button");
-    button.id = "fetch-email-summary-button";
-    button.textContent = "Fetch Email Summary";
-    button.style.marginBottom = "10px";
-    button.style.fontSize = "14px";
-    button.style.cursor = "pointer";
 
-    button.addEventListener("click", async (event) => {
-      event.stopPropagation();
-      const emailId = getEmailIdFromDOM();
-      if (emailId) {
-        await handleFetchEmail(emailId);
-      } else {
-        console.error("Email ID extraction failed.");
-      }
-    });
-
-    if (emailTitle.parentElement) {
-      if (emailTitle.nextSibling) {
-        emailTitle.parentElement.insertBefore(button, emailTitle.nextSibling);
-      } else {
-        emailTitle.parentElement.appendChild(button);
-      }
-    }
+    const button = createButton();
+    emailTitle.insertBefore(button, emailTitle.firstChild);
   } else {
     console.error("Email title element not found; cannot inject button after title.");
   }
