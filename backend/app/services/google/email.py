@@ -1,5 +1,5 @@
 from services.clients.async_client import client
-
+from config.logger import logger
 async def getEmail(headers: str, emailId: str):
     try:
         headerValues = {
@@ -10,5 +10,5 @@ async def getEmail(headers: str, emailId: str):
         if response.status_code == 200:
             return response.json()
     except Exception as error:
-        print(f"An error occurred: {error}")
+        logger.error(f"An error occurred: {error}")
         return error

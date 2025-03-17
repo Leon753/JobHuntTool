@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from services.google.email import getEmail 
 from services.google.sheets import createSheet, updateSheet
-
+from config.logger import logger
 router = APIRouter()
 
 @router.get("/get-email/{emailId}")
@@ -23,7 +23,7 @@ async def createSpreadsheet(req: Request):
         success.update(res)
         return success
     except Exception as e:
-        print(e)
+        logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
     
 
@@ -37,6 +37,6 @@ async def updateSpreadsheet(req: Request):
         success.update(res)
         return success
     except Exception as e:
-        print(e)
+        logger.error(e)
         raise HTTPException(status_code=500, detail=str(e))
 

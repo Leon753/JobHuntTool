@@ -19,7 +19,8 @@ def get_columns_content_strings(columns: Columns) -> dict[str, str]:
         # 'data' is a dict with keys: status, content, source.
         # We join the items in the 'content' list.
         content_list = data.get("content", [])
-        result[column_name] = "\n".join(content_list)
+        content_list[0] = "*" + content_list[0]
+        result[column_name] = "\n*".join(content_list)
     return result
 
 
@@ -39,3 +40,46 @@ def decode_email_parts(email_parts: list) -> list:
             decoded_string = base64.b64decode(b64).decode('utf-8')
             decoded_results.append(decoded_string)
     return decoded_results
+
+def update_headers_and_format(sheet_id, num_columns)->list:
+        return [
+            # Auto-resize columns
+            {
+                "autoResizeDimensions": {
+                    "dimensions": {
+                        "sheetId": sheet_id,
+                        "dimension": "COLUMNS",
+                        "startIndex": 0,
+                        "endIndex": num_columns  # Adjust based on header count
+                    }
+                }
+            },
+            # Format Header Row (Bold, Background Color, Center Align)
+            {
+                "repeatCell": {
+                    "range": {
+                        "sheetId": sheet_id,
+                        "startRowIndex": 0,
+                        "endRowIndex": 1  # Only format first row (headers)
+                    },
+                    "cell": {
+                        "userEnteredFormat": {
+                            "backgroundColor": {"red": 0.2, "green": 0.6, "blue": 1},  # Light blue
+                            "textFormat": {"bold": True, "fontSize": 12},
+                            "horizontalAlignment": "CENTER"
+                        }
+                    },
+                    "fields": "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)"
+                }
+            },
+            # Freeze Header Row
+            {
+                "updateSheetProperties": {
+                    "properties": {
+                        "sheetId": sheet_id,
+                        "gridProperties": {"frozenRowCount": 1}
+                    },
+                    "fields": "gridProperties.frozenRowCount"
+                }
+            }
+        ]

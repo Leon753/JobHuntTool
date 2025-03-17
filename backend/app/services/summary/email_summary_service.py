@@ -51,13 +51,13 @@ async def email_summary(email:str) -> GPT_Email_Summary_Response:
         # msg  =  string_to_json(msgs[-1])
         response = json.loads(msgs[-1])
     except Exception as e:
-        print("ERROR RESPONSE", e)
+        logger.error("ERROR RESPONSE", e)
         raise SyntaxError("Response validation failed")
     
     try :
         response_format = GPT_Email_Summary_Response(**response)
     except Exception as e:
-        print("ERROR RESPONSE", e)
+        logger.error("ERROR RESPONSE", e)
         raise SyntaxError("Response validation failed")
     
     return response_format
