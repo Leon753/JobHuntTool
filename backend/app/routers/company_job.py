@@ -191,11 +191,8 @@ async def get_company_job_info( email_id: str = Body(...), authorization: str = 
                 "values": [row_values]
             }
             sheets_data["data"].append(rowDataItem)
-            try: 
-                res = await sheets.updateSheet(authorization, sheets_data, excel_id)
-                #res = await sheets.updateSheetformat(authorization, sheet_format_json, excel_id)
-            except Exception as e:
-                raise HTTPException(status_code=500, detail="Response validation failed")
+            
+            res = await sheets.updateSheet(authorization, sheets_data, excel_id)
             await user_service.update_user_row(user_id=user_id, current_sheet_row=row+1)
             
 

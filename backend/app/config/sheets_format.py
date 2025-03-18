@@ -3,26 +3,13 @@ TABLE_SIZE_ROW = 100
 TABLE_SIZE_COUMN = 7
 sheet_format_json = {
   "requests": [
-    #TOD0: REMOVE AFFTER DEBUGGING clears all formating 
-    {
-      "repeatCell": {
-        "range": {
-          "sheetId": 0,
-          "startRowIndex": 0,
-          "endRowIndex": 0
-        },
-        "cell": {
-          "userEnteredFormat": {}
-        },
-        "fields": "userEnteredFormat"
-      }
-    },
     {
       "autoResizeDimensions": {
         "dimensions": {
           "sheetId": 0,
           "dimension": "COLUMNS",
-          "startIndex": 0
+          "startIndex": 0,
+          "endIndex": 10
         }
       }
     },
@@ -46,20 +33,22 @@ sheet_format_json = {
         "range": {
           "sheetId": 0,
           "startRowIndex": 0, # TODO: ADD IN ROW & COLUMN
-          "endRowIndex": 1
+          "endRowIndex": 1,
+          "startColumnIndex": 0,
+          "endColumnIndex": 7
         },
         "cell": {
           "userEnteredFormat": {
             "wrapStrategy": "WRAP", 
             "backgroundColor": {
-              "red": 0.2,
-              "green": 0.2,
-              "blue": 0.6 # TODO: FIX COLORS
+              "red": 0.25,
+              "green": 0.41,
+              "blue": 0.88 # TODO: FIX COLORS
             },
-            "textFormat": {
-              "bold": "true",
-              "fontSize": 12
-            },
+            # "textFormat": {
+            #   "bold": "true",
+            #   "fontSize": 12
+            # },
             "horizontalAlignment": "CENTER"
           }
         },
