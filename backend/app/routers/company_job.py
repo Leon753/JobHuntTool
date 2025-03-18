@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Header, Body
 from services.clients.perplexity_client import PerplexityClient 
 from config.keys import PERPLEXITY_API_KEY
 from models.email_summary import GPT_Email_Summary_Response, Status
-from utils.helpers import decode_email_parts, get_columns_content_strings, string_to_json, update_headers_and_format
+from utils.helpers import decode_email_parts, get_columns_content_strings, string_to_json
 from services.memory import memo_service
 from services.summary  import crewai_table_service
 from services.user  import user_service
