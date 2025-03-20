@@ -1,63 +1,220 @@
+# research_task:
+#   description: >
+#     Conduct thorough research on {company} and the {job} role.
+#     A SUMMARY HAS ALREADY BEEN PROVIDED: {summary}
+    
+#     Collect detailed and **cross-verified** information, including:
+#     - **Company Overview**: Official company name, history, and notable achievements.
+#     - **Company Mission & Vision**: Strategic goals and company culture.
+#     - **Market Position & Financials**: Industry standing, revenue, funding rounds (if applicable).
+#     - **Job Details**: Exact job title, key responsibilities, and location details.
+#     - **Required Skills**: Technical and soft skills expected for the {job} role.
+#     - **Interview Process**: Number of rounds, behavioral vs. technical, test types.
+#     - **Real-world Interview Experiences**: Gather insights from Blind, Glassdoor, LinkedIn posts, or GitHub discussions.
+#     - **Salary Range & Benefits**: Extract pay insights from Levels.fyi, Glassdoor, and public salary disclosures.
+#     - **Career Growth Potential**: Internal mobility, training programs, and past employee experiences.
+#     - **Example Technical Questions**: Include real LeetCode or system design questions if available.
+
+#     Use only **trusted, up-to-date** sources and provide a list of URLs for verification.
+#     Extract **all available details** without summarizing into key points.
+
+#   expected_output: >
+#     Write a **full, detailed report** containing all research findings without summarizing or shortening any sections. 
+#     The report should include:
+#     - **Company Name & Overview**
+#     - **Company Mission, Vision & Strategic Goals**
+#     - **Job Title & Responsibilities**
+#     - **Required Skills**
+#     - **Market Position & Financials**
+#     - **Interview Process Breakdown**
+#     - **Real Interview Experiences**
+#     - **Salary Insights & Benefits**
+#     - **Career Growth Opportunities**
+#     - **Example LeetCode/System Design Questions**
+#     - **All referenced sources (URLs included).**
+#   agent: researcher
+
 research_task:
   description: >
-    Conduct thorough research on {company} and the {job} role.
-    A SUMMARY HAS ALREADY BEEN PROVIDED: {summary}
-    Collect detailed information including:
-    - Company Overview and Name
-    - Company Mission and Vision (including strategic goals)
-    - Market Position and Financial Metrics
-    - Job Title and Key Responsibilities
-    - Required Skills for the {job} role
-    - Interview Experiences and sample technical questions (e.g., LeetCode questions)
-    Use up-to-date sources to extract 10 key bullet points.
+    Conduct **comprehensive and unbiased research** on {topic}.  
+    A SUMMARY HAS ALREADY BEEN PROVIDED: {summary}.
+
+    Collect **detailed, factual, and cross-verified** insights, ensuring that:
+    - **No summarization occurs**—retain all relevant details.
+    - **Information is pulled from multiple reputable sources.**
+    - **No bias is introduced; report purely factual findings.**
+    - **All sources are cited with URLs.**
+
+    The research must include the following structured sections:
+
+    ### **1. Company Overview**
+    **Subtasks:**
+    - Retrieve **official company name, founding year, and headquarters**.  
+    - Identify **founders & key executives** (CEO, leadership).  
+    - Outline **major business divisions and core products/services**.  
+    - Provide **historical milestones & notable achievements**.  
+    - Analyze **recent innovations & upcoming projects**.  
+    - Describe **public perception & brand reputation**.  
+    - List **notable awards or industry recognitions**.  
+
+    ### **2. Company Mission & Vision**
+    **Subtasks:**
+    - Extract the **official mission & vision statements**.  
+    - Explain how the company’s **strategic goals align with its mission**.  
+    - Describe how the **company differentiates itself from competitors**.  
+    - Include insights on **company culture, values, and employee experience**.  
+    - Summarize **corporate social responsibility (CSR) initiatives**.  
+    - Identify **sustainability or ethical commitments**.  
+
+    ### **3. Market Position & Financials**
+    **Subtasks:**
+    - Summarize **industry standing & market share trends**.  
+    - Analyze **yearly revenue & financial growth**.  
+    - Document **major funding rounds, investors, and valuation history**.  
+    - Compare **business segments’ profitability & competitive landscape**.  
+    - Identify **key competitors and industry benchmarking**.  
+    - Extract **customer or market feedback (from reviews, analyst reports, forums, etc.)**.  
+    - Summarize **future growth predictions & market trends**.  
+
+    ### **4. Job Details**
+    **Subtasks:**
+    - Extract **exact job title & department**.  
+    - Outline **day-to-day responsibilities & major tasks**.  
+    - Explain **core areas of focus**.  
+    - Describe **team collaboration (cross-functional teams, reporting structure)**.  
+    - Identify **location expectations (onsite, hybrid, remote work policies)**.  
+    - Identify **common challenges in the role (from insider reviews)**.  
+    - Provide insights on **what makes a candidate successful in this role**.  
+
+    ### **5. Required Skills**
+    **Subtasks:**
+    - List **minimum qualifications & degree requirements**.  
+    - Detail **specific skills required for the role**.  
+    - Identify **soft skills & personality traits valued by the company**.  
+    - Gather insights on **what hiring managers prioritize in candidates**.  
+    - Identify **emerging skills or trends affecting this role**.  
+    - Compare skills to **similar roles in different companies**.  
+
+    ### **6. Interview Process**
+    **Subtasks:**
+    - Describe the **number of interview rounds & overall process timeline**.  
+    - Explain the **types of interviews** (behavioral, technical, case studies, assessments).  
+    - List **example questions from real interviews**.  
+    - Mention **online platforms used for tests (HackerRank, in-house assessments, etc.)**.  
+    - Detail **what candidates typically struggle with**.  
+    - Include **insider tips from past candidates**.  
+    - Identify **common reasons for rejection**.  
+
+    ### **7. Real-World Interview Experiences**
+    **Subtasks:**
+    - Collect **candidate feedback from Blind, Glassdoor, LinkedIn discussions**.  
+    - Summarize **successful vs. unsuccessful candidate experiences**.  
+    - Identify **key pain points in the hiring process**.  
+    - Highlight **common red flags that lead to rejection**.  
+    - Extract **hiring manager feedback or recruiter insights**.  
+    - Identify **variability in hiring practices across teams/departments**.  
+
+    ### **8. Salary Range & Benefits**
+    **Subtasks:**
+    - Extract **salary data from Levels.fyi, Glassdoor, PayScale**.  
+    - Provide a **range for junior, mid, and senior roles**.  
+    - Outline **benefits (stock options, retirement plans, healthcare, parental leave, relocation, etc.)**.  
+    - Compare salaries **against industry benchmarks**.  
+    - Identify **performance-based incentives & bonuses**.  
+    - Summarize **negotiation strategies & salary trends**.  
+
+    ### **9. Career Growth Potential**
+    **Subtasks:**
+    - Analyze **career progression opportunities within the company**.  
+    - List **internal mobility options (switching departments, leadership pathways, mentorship programs)**.  
+    - Provide insights on **training & professional development programs**.  
+    - Identify **real examples of employees who moved up the ranks**.  
+    - Compare **career growth prospects vs. other companies**.  
+    - Identify **external opportunities available to candidates with this experience**.  
+
+    ### **10. Example Technical Questions**
+    **Subtasks:**
+    - Retrieve **common technical interview questions**.  
+    - Categorize into **problem-solving, system design, optimization, algorithms, case studies, etc.**.  
+    - Provide **real-world examples & expected answer approaches**.  
+    - Include **LeetCode-style or case study questions used in past interviews**.  
+    - Identify **trends in technical assessments over time**.  
+
+    ### **11. Diversity, Equity, and Inclusion (DEI)**
+    **Subtasks:**
+    - Analyze the companys **diversity policies & hiring statistics**.  
+    - Extract **DEI initiatives & programs**.  
+    - Summarize **employee satisfaction with DEI efforts**.  
+    - Compare DEI efforts **with competitors in the industry**.  
+
+    ### **12. Work-Life Balance & Employee Satisfaction**
+    **Subtasks:**
+    - Retrieve **employee feedback from reviews, forums, and surveys**.  
+    - Identify **common complaints or praises regarding work-life balance**.  
+    - Extract **company policies on PTO, work hours, flexibility, etc.**.  
+    - Compare **employee satisfaction ratings with industry standards**.  
+
+    ### **13. Data Sources & References**
+    **Subtasks:**
+    - Ensure **every section cites multiple sources**.  
+    - Prioritize **trusted sources such as official company pages, SEC filings, Levels.fyi, Glassdoor, LinkedIn discussions, and industry reports**.  
+    - Provide **direct URLs** for further verification.  
+
   expected_output: >
-    A list of 10 bullet points summarizing key findings about {company} and the {job} role,
-    covering aspects such as Company Name, Company Mission and Vision,
-    Job Title, Key Responsibilities, Required Skills, Interview Experiences, and Example LeetCode Questions.
+    Generate a **detailed, structured research report** covering all required sections **without summarization or data loss**.
+    Ensure:
+    - **No information is omitted or overly condensed.**
+    - **All sections include in-depth explanations and real-world data.**
+    - **Sources are explicitly cited at the end with full URLs.**
   agent: researcher
+
 
 reporting_task:
   description: >
-    - Provide a comprehensive summary about {company} and the job position {job}. Gather the following information:
-        1. **Job Description:**
-            - Search LinkedIn, the Company Career Site, Indeed, and Glassdoor for the job posting details.
-        2. **Salary/Pay Range:**
-            - Search http://levels.fyi/ for details on the salary range for {job} at {company}.
-        3. **Interview Process:**
-            - Gather insights from interview process reviews.
-            - Identify whether the technical interviews are more focused on algorithms or data structures.
-            - Explicity specify the range of total number of rounds, breaking them down into behavioral and technical rounds.
-            - Include the typical overall duration of the interview process.
-        4. **Interview Experience:**
-            - Find an example of an interview experience for {job} at {company}.
-        5. **Recommended Preparation:**
-            - Search Reddit and Leetcode for recommended Leetcode problems for {company}.
+    Convert the **full** research report into a structured JSON format for automated job tracking.
+
+    The JSON will be sent to our **Google Sheets API** for visualization and tracking. 
+    Ensure that all details are captured **without any summarization or loss of information**.
+    
+    The contents should be **a list of bullet points**, where each bullet point corresponds to an **index in the list**.
+
   expected_output: >
-    - Output a JSON object in the following format, and do not include any additional text or markdown:
+    Output a **valid JSON object** in the following structure (without additional text or markdown):
 
             {{
                 "company": "{company}",
                 "results": {{
                     "job_description": {{
-                    "status": "<Validated|Needs Work|Incorrect>",
-                    "content": "List<Concise summary of the job posting>",
-                    "source": ["<url1>", "<url2>", ...]
+                        "status": "<Validated|Needs Work|Incorrect>",
+                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Full job description text as retrieved
+                        "source": ["<url1>", "<url2>", ...]
                     }},
                     "pay_range": {{
-                    "status": "<Validated|Needs Work|Incorrect>",
-                    "content": " List<Details on the salary range>",
-                    "source": ["<url1>", "<url2>", ...]
+                        "status": "<Validated|Needs Work|Incorrect>",
+                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Full salary details including stock options, benefits, and bonuses
+                        "source": ["<url1>", "<url2>", ...]
                     }},
                     "interview_process": {{
-                    "status": "<Validated|Needs Work|Incorrect>",
-                    "content": "List <Details on the interview process, including round counts (behavioral and technical) and overall duration>",
-                    "source": ["<url1>", "<url2>", ...]
+                        "status": "<Validated|Needs Work|Incorrect>",
+                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Detailed breakdown of the interview process, number of rounds, types of questions asked
+                        "source": ["<url1>", "<url2>", ...]
                     }},
                     "example_interview_experience": {{
-                    "status": "<Validated|Needs Work|Incorrect>",
-                    "content": "List<Example of an interview experience>",
-                    "source": ["<url1>", "<url2>", ...]
+                        "status": "<Validated|Needs Work|Incorrect>",
+                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Full interview experiences as reported by past candidates
+                        "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "career_growth": {{
+                        "status": "<Validated|Needs Work|Incorrect>",
+                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Detailed career growth opportunities, training programs, internal mobility
+                        "source": ["<url1>", "<url2>", ...]
+                    }},
+                    "example_technical_questions": {{
+                        "status": "<Validated|Needs Work|Incorrect>",
+                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Full LeetCode/system design questions as found, without summarization
+                        "source": ["<url1>", "<url2>", ...]
                     }}
                 }}
             }}
   agent: reporting_analyst
+

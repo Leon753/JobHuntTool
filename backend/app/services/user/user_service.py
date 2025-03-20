@@ -70,7 +70,7 @@ async def get_excel_job_row_from_db(user_id:str, company:str, position:str):
             row = await cursor.fetchone()
             if row is None:
                 return None
-            return row
+            return row["sheet_row"]
 
 async def does_excel_job_exist(user_id: str, company: str, position: str) -> bool:
     async with aiosqlite.connect(DATABASE) as db:
