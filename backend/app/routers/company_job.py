@@ -11,6 +11,9 @@ from services.user  import user_service
 from services.google import sheets
 from services.summary import email_summary_service
 from services.google.email import getEmail 
+from config.logger import logger
+from config.sheets_format import sheet_format_json
+from utils.exception.google_exception import GoogleSheetsAPIError
 # set up logger 
 router = APIRouter() 
 
@@ -93,33 +96,44 @@ async def get_company_job_info(company: str, job_position: str):
     try:
         response = json.loads(string_to_json(response))
     except Exception as e:
-        print("ERROR RESPONSE", e)
+        logger.error(f"ERROR RESPONSE {e}")
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     try:
         response = JobInformation(**response)
     except Exception as e:
-        print("ERROR RESPONSE", e)
+        logger.error(f"ERROR RESPONSE {e}")
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     return response
 
+
+
 @router.post("/company-job-info-crew-ai")
 async def get_company_job_info( email_id: str = Body(...), authorization: str = Header(...) ):
+    logger.info("INFO CREW AI CALLED")
     email_response = await getEmail(authorization, email_id)
     results = decode_email_parts(email_response['payload']['parts'])[0]
     user_id = email_response['payload']['headers'][0]['value']
     summary_json:GPT_Email_Summary_Response = await email_summary_service.email_summary(results)
-
+    sheets_data = {
+                "valueInputOption": "USER_ENTERED",
+                "data": [],
+                "includeValuesInResponse": "false",
+                "responseValueRenderOption": "FORMATTED_VALUE",
+                "responseDateTimeRenderOption": "SERIAL_NUMBER"
+            }
+    
     match(summary_json.status): 
         case Status.IN_REVIEW | Status.INTERVIEWING:
+            #TODO: REFACTOR THIS IF INTO A NEW FUNCTION
             query_key = summary_json.company+summary_json.job_position
             if await memo_service.query_exists(query_key):
                 response_dict = await memo_service.get_response_for_query(query_key)
                 try:
                     response_format = JobInformation(**response_dict)
                 except Exception as e:
-                    print("ERROR RESPONSE", e)
+                    logger.error(F"ERROR RESPONSE{e}")
                     raise HTTPException(status_code=500, detail="Response validation failed")
             else: 
                 inputs = {
@@ -134,6 +148,8 @@ async def get_company_job_info( email_id: str = Body(...), authorization: str = 
                     raise HTTPException(status_code=500, detail="Response validation failed")
            
             user_service_response = await user_service.get_user_excel_from_db(user_id=user_id)
+
+            #TODO: REFACTOR THIS IF INTO A NEW FUNCTION
             if user_service_response is None:
                 row = 2
                 data = {
@@ -141,31 +157,23 @@ async def get_company_job_info( email_id: str = Body(...), authorization: str = 
                 }   
                 res = await sheets.createSheet(authorization, data)
                 excel_id = res['spreadsheetId']
-                await user_service.save_user_info_to_db(user_id=user_id,
-                                                        current_sheet_row=1, 
-                                                        excel_id=res['spreadsheetId'])
-            else :
-               
-                row  = user_service_response["current_sheet_row"]
-                excel_id = user_service_response["excel_id"]
-
-            sheets_data = {
-                "valueInputOption": "USER_ENTERED",
-                "data": [],
-                "includeValuesInResponse": "false",
-                "responseValueRenderOption": "FORMATTED_VALUE",
-                "responseDateTimeRenderOption": "SERIAL_NUMBER"
-            }
-            if row == 2:
                 headerDataItem = {
                         "range": f"{HEADER_COLUMNS[0]}1:{HEADER_COLUMNS[-1]}1",
                         "majorDimension": "ROWS",
-                        "values": [HEADER_NAMES]
+                        "values": [HEADER_NAMES],
+
                     }
                 sheets_data["data"].append(headerDataItem)
+                await user_service.save_user_info_to_db(user_id=user_id,
+                                                        current_sheet_row=1, 
+                                                        excel_id=res['spreadsheetId'])
+                res = await sheets.updateSheetformat(authorization, sheet_format_json, excel_id)
+            else :
+                row  = user_service_response["current_sheet_row"]
+                excel_id = user_service_response["excel_id"]
 
-
-            content_strings = get_columns_content_strings(response_format.results)
+            #REFACTOR THIS TO A NEW FUNCTION
+            content_strings = get_columns_content_strings(response_format.results) 
             row_values = [
                 summary_json.company,           
                 summary_json.job_position,      
@@ -186,6 +194,7 @@ async def get_company_job_info( email_id: str = Body(...), authorization: str = 
             
             res = await sheets.updateSheet(authorization, sheets_data, excel_id)
             await user_service.update_user_row(user_id=user_id, current_sheet_row=row+1)
+            
 
             
         case Status.OFFER | Status.REJECTED:

@@ -19,7 +19,8 @@ def get_columns_content_strings(columns: Columns) -> dict[str, str]:
         # 'data' is a dict with keys: status, content, source.
         # We join the items in the 'content' list.
         content_list = data.get("content", [])
-        result[column_name] = "\n".join(content_list)
+        content_list[0] = "*" + content_list[0]
+        result[column_name] = "\n*".join(content_list)
     return result
 
 

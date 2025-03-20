@@ -7,16 +7,13 @@ from models.create_table import JobInformation
 import os
 import yaml
 from config.keys import *
+from config.logger import logger
 
 duck_search_tool = DuckDuckGoSearchTool()
 perplexity_search_tool = PerplexitySearchTool()
 
 
 webscrapper = WebScrapperTool()
-#TODO Need to delete this lines
-
-
-
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # Load YAML Configuration
 def load_config(file:str):
@@ -52,12 +49,12 @@ config = dict(
 class TableMakerCrew():
     @before_kickoff
     def before_kickoff_function(self, inputs):
-        print(f"Before kickoff function with inputs: {inputs}")
+        logger.info(f"Before kickoff function with inputs: {inputs}")
         return inputs # You can return the inputs or modify them as needed
     
     @after_kickoff
     def after_kickoff_function(self, result):
-        print(f"After kickoff function with result: {result}")
+        logger.info(f"After kickoff function with result: {result}")
         return result # You can return the result or modify it as needed
     @agent
     def researcher(self) -> Agent:
