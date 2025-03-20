@@ -20,22 +20,25 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(default_format)
         return log_color + formatter.format(record)
 
+# Standard File Formatter (No Colors)
+file_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 console_handler = logging.StreamHandler()
 
 console_handler.setFormatter(CustomFormatter())
+
+
+# File Handler (without Colors)
+file_handler = logging.FileHandler("app.log")
+file_handler.setFormatter(file_formatter)
+
 # Remove any default handlers (fixes conflicts)
 if logger.hasHandlers():
     logger.handlers.clear()
 
 # Add the new handler
 logger.addHandler(console_handler)
+logger.addHandler(file_handler)
 logger.propagate = False
-# Test the logger
-logger.debug("This is a DEBUG message.")
-logger.info("This is an INFO message.")
-logger.warning("This is a WARNING message.")
-logger.error("This is an ERROR message.")
-logger.critical("This is a CRITICAL message.")
