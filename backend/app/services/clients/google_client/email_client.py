@@ -1,6 +1,6 @@
 from services.clients.async_client import client
 from config.logger import logger
-async def get_email(headers: str, emailId: str):
+async def get_email_client(headers: str, emailId: str):
     try:
         headerValues = {
             "Authorization": headers,

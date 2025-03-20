@@ -1,7 +1,7 @@
 import base64
 import re
-from models.create_table import Columns 
-
+from models.create_table import Columns , JobInformation
+from models.email_summary import GPT_Email_Summary_Response
 def string_to_json(response):
     cleaned = re.sub(r"^```json\s*", "", response)
     cleaned = re.sub(r"\s*```$", "", cleaned)
@@ -23,6 +23,20 @@ def get_columns_content_strings(columns: Columns) -> dict[str, str]:
         result[column_name] = "\n*".join(content_list)
     return result
 
+def extract_row_values(response:JobInformation, summary_json:GPT_Email_Summary_Response) -> list:
+    content_strings = get_columns_content_strings(response.results) 
+    row_values = [
+        summary_json.company,           
+        summary_json.job_position,      
+        str(summary_json.status.name),  
+        content_strings["job_description"],
+        content_strings["pay_range"],
+        content_strings["interview_process"],
+        content_strings["example_interview_experience"],
+        content_strings["career_growth"],
+        content_strings["example_technical_questions"],
+    ]
+    return row_values
 
 def decode_email_parts(email_parts: list) -> list:
     decoded_results = []

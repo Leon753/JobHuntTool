@@ -13,5 +13,6 @@ async def crewai_table(query_key:str, inputs:dict):
         response_format = JobInformation(**result.json_dict)
         return response_format
     except Exception as e:
-        logger.error("ERROR RESPONSE", e)
+        logger.error(f"ERROR RESPONSE: {e}")
         raise Exception from e
+    

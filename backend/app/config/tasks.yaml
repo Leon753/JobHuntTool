@@ -1,42 +1,6 @@
-# research_task:
-#   description: >
-#     Conduct thorough research on {company} and the {job} role.
-#     A SUMMARY HAS ALREADY BEEN PROVIDED: {summary}
-    
-#     Collect detailed and **cross-verified** information, including:
-#     - **Company Overview**: Official company name, history, and notable achievements.
-#     - **Company Mission & Vision**: Strategic goals and company culture.
-#     - **Market Position & Financials**: Industry standing, revenue, funding rounds (if applicable).
-#     - **Job Details**: Exact job title, key responsibilities, and location details.
-#     - **Required Skills**: Technical and soft skills expected for the {job} role.
-#     - **Interview Process**: Number of rounds, behavioral vs. technical, test types.
-#     - **Real-world Interview Experiences**: Gather insights from Blind, Glassdoor, LinkedIn posts, or GitHub discussions.
-#     - **Salary Range & Benefits**: Extract pay insights from Levels.fyi, Glassdoor, and public salary disclosures.
-#     - **Career Growth Potential**: Internal mobility, training programs, and past employee experiences.
-#     - **Example Technical Questions**: Include real LeetCode or system design questions if available.
-
-#     Use only **trusted, up-to-date** sources and provide a list of URLs for verification.
-#     Extract **all available details** without summarizing into key points.
-
-#   expected_output: >
-#     Write a **full, detailed report** containing all research findings without summarizing or shortening any sections. 
-#     The report should include:
-#     - **Company Name & Overview**
-#     - **Company Mission, Vision & Strategic Goals**
-#     - **Job Title & Responsibilities**
-#     - **Required Skills**
-#     - **Market Position & Financials**
-#     - **Interview Process Breakdown**
-#     - **Real Interview Experiences**
-#     - **Salary Insights & Benefits**
-#     - **Career Growth Opportunities**
-#     - **Example LeetCode/System Design Questions**
-#     - **All referenced sources (URLs included).**
-#   agent: researcher
-
 research_task:
   description: >
-    Conduct **comprehensive and unbiased research** on {topic}.  
+    Conduct **comprehensive and unbiased research** on {job} {company}.  
     A SUMMARY HAS ALREADY BEEN PROVIDED: {summary}.
 
     Collect **detailed, factual, and cross-verified** insights, ensuring that:
@@ -71,7 +35,7 @@ research_task:
     - Summarize **industry standing & market share trends**.  
     - Analyze **yearly revenue & financial growth**.  
     - Document **major funding rounds, investors, and valuation history**.  
-    - Compare **business segments’ profitability & competitive landscape**.  
+    - Compare **business segments profitability & competitive landscape**.  
     - Identify **key competitors and industry benchmarking**.  
     - Extract **customer or market feedback (from reviews, analyst reports, forums, etc.)**.  
     - Summarize **future growth predictions & market trends**.  
