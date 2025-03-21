@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from db.database import init_db
-from routers import company_job, user_info, google
+from routers import company_job, user_info
 from fastapi.middleware.cors import CORSMiddleware
 
 @asynccontextmanager
@@ -13,7 +13,6 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(company_job.router, prefix="/company")
 app.include_router(user_info.router, prefix="/user")
-app.include_router(google.router, prefix="/google")
 
 app.add_middleware(
     CORSMiddleware,

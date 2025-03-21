@@ -3,7 +3,7 @@ from config.logger import logger
 from utils.exception.google_exception import GoogleSheetsAPIError
 import json
 
-async def createSheet(auth_header: str, body: dict) -> dict:
+async def create_sheet(auth_header: str, body: dict) -> dict:
     if not auth_header:
         raise ValueError("Missing authorization header")
     headerValues = {
@@ -23,7 +23,7 @@ async def createSheet(auth_header: str, body: dict) -> dict:
         logger.error(f"Google Sheets API Error:  {e.response.status_code}: details : {e.response.text}")
         raise GoogleSheetsAPIError(e.response) from e
 
-async def updateSheet(auth_header: str, body: dict, spreadsheetId: str) -> dict:
+async def update_sheet(auth_header: str, body: dict, spreadsheetId: str) -> dict:
     if not auth_header:
             raise ValueError("Missing authorization header")
         
@@ -43,7 +43,7 @@ async def updateSheet(auth_header: str, body: dict, spreadsheetId: str) -> dict:
         logger.error(f"Google Sheets API Error {e.response.status_code}: details : {e.response.text}")
         raise GoogleSheetsAPIError(e.response) from e
 
-async def updateSheetformat(auth_header: str, body: dict, spreadsheetId: str) -> dict:
+async def update_sheet_format(auth_header: str, body: dict, spreadsheetId: str) -> dict:
     if not auth_header:
         raise ValueError("Missing authorization header")
         

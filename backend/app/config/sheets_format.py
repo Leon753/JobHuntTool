@@ -1,6 +1,7 @@
 SHEET_ID = 0 
 TABLE_SIZE_ROW = 100
 TABLE_SIZE_COUMN = 7
+
 sheet_format_json = {
   "requests": [
     {
@@ -9,7 +10,7 @@ sheet_format_json = {
           "sheetId": 0,
           "dimension": "COLUMNS",
           "startIndex": 0,
-          "endIndex": 10
+          "endIndex": 12
         }
       }
     },
@@ -35,7 +36,7 @@ sheet_format_json = {
           "startRowIndex": 0, # TODO: ADD IN ROW & COLUMN
           "endRowIndex": 1,
           "startColumnIndex": 0,
-          "endColumnIndex": 7
+          "endColumnIndex": 10
         },
         "cell": {
           "userEnteredFormat": {
