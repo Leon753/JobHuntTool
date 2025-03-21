@@ -8,8 +8,6 @@ async def crewai_table(query_key:str, inputs:dict):
     try:
         result = await asyncio.to_thread(TableMakerCrew().crew().kickoff, inputs) 
         await memo_service.save_query_response(query_key, result.json_dict)
-        print("INSERTING")
-        print(result.json_dict)
         response_format = JobInformation(**result.json_dict)
         return response_format
     except Exception as e:

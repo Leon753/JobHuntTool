@@ -138,7 +138,7 @@ async def get_company_job_info( email_id: str = Body(...), authorization: str = 
                 row = 2
                 data = {
                     "properties": { "title": "BACKEND JobHuntingTest" }
-                }   
+                }
                 res = await sheets.createSheet(authorization, data)
                 excel_id = res['spreadsheetId']
                 await user_service.save_user_info_to_db(user_id=user_id,
