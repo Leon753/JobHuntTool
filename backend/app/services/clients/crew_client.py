@@ -8,7 +8,7 @@ import os
 import yaml
 from config.keys import *
 from config.logger import logger
-
+from services.tools.guardrail.gpt_provide_feedback import researcher_summary_feedback
 duck_search_tool = DuckDuckGoSearchTool()
 perplexity_search_tool = PerplexitySearchTool()
 
@@ -61,7 +61,7 @@ class TableMakerCrew():
         return Agent(
             config=agents_config['researcher'],
             verbose=True,
-            tools=[perplexity_search_tool],
+            # tools=[perplexity_search_tool],
         )
 
     @agent
@@ -77,7 +77,9 @@ class TableMakerCrew():
             config=tasks_config['research_task'],
             description=tasks_config['research_task']['description'],
             expected_output=tasks_config['research_task']['expected_output'],
-            agent=self.researcher()
+            agent=self.researcher(),
+            guardrail=researcher_summary_feedback,
+            retry_count=10
         )
 
     @task
@@ -85,8 +87,10 @@ class TableMakerCrew():
         return Task(
             description=tasks_config['reporting_task']['description'],
             expected_output=tasks_config['reporting_task']['expected_output'],
+            context=[self.research_task()],
             agent=self.reporting_analyst(),
             output_json=JobInformation,
+         
         )
     @crew
     def crew(self) -> Crew:

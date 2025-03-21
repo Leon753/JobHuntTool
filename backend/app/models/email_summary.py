@@ -16,3 +16,7 @@ class GPT_Email_Summary_Response(BaseModel):
     company: str
     job_position: str
     status: Status
+
+class GPT_SUMMARY_FEEDBACK(BaseModel):
+    should_continue:bool
+    feedback: str
