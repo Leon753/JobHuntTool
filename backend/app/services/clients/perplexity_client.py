@@ -5,8 +5,8 @@ import logging
 import certifi
 import ssl
 import requests
+from config.logger import logger
 
-logger = logging.getLogger(__name__)
 ssl_context = ssl.create_default_context(cafile=certifi.where())
 
 class PerplexityClient:
@@ -14,6 +14,7 @@ class PerplexityClient:
         self.api_key = api_key
         self.api_url = api_url
         self.model = model
+
     def get_response_sync(self, messages:list, response_format: dict=None, timeout: int = 120) -> str:
         """
             Synchronous function to get a response from the Perplexity API.
@@ -38,7 +39,7 @@ class PerplexityClient:
             json_response = response.json()
             return json_response["choices"][0]["message"]["content"]
         except requests.Timeout:
-            logger.error("⏳ API request timed out after %d seconds", timeout)
+            logger.error(f"⏳ API request timed out after %d seconds{timeout}" )
             return None
         except Exception as e:
             logger.error(f"❌ API request failed: {e}")
@@ -78,7 +79,7 @@ class PerplexityClient:
                 return json_response["choices"][0]["message"]["content"]
             
         except asyncio.TimeoutError:
-            logger.error("⏳ API request timed out after %d seconds", timeout)
+            logger.error("⏳ API request timed out after %d seconds {timeout}")
             return None
         except Exception as e:
             logger.error(f"❌ API request failed: {e}")

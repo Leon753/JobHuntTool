@@ -1,11 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Dict
 
-
-HEADER_COLUMNS = ["A", "B", "C", "D", "E", "F", "G"]
-HEADER_NAMES = ["COMPANY", "JOB", "STATUS","JOB DESCRIPTION", "PAY RANGE", "INTERVIEW PROCESS", "EXAMPLE INTERVIEW EXPERIENCE"]
-
-
+# Archive for LLM Query Calls 
 class DataItem(BaseModel):
     range: str
     majorDimension: str
@@ -35,6 +31,9 @@ class Columns(BaseModel):
     pay_range: ColumnResult
     interview_process: ColumnResult
     example_interview_experience: ColumnResult
+    career_growth: ColumnResult
+    example_technical_questions: ColumnResult
+
 
 class JobInformation(BaseModel):
     company: str

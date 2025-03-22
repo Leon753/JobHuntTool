@@ -1,16 +1,15 @@
 import json
-from models.create_table import HEADER_COLUMNS, HEADER_NAMES, JobInformation
+from models.create_table import JobInformation
 from fastapi import APIRouter, HTTPException, Header, Body
 from services.clients.perplexity_client import PerplexityClient 
 from config.keys import PERPLEXITY_API_KEY
 from models.email_summary import GPT_Email_Summary_Response, Status
-from utils.helpers import decode_email_parts, get_columns_content_strings, string_to_json
-from services.memory import memo_service
-from services.summary  import crewai_table_service
-from services.user  import user_service
-from services.google import sheets
+from utils.helpers import string_to_json
 from services.summary import email_summary_service
-from services.google.email import getEmail 
+from services.job import job_status_service
+from config.logger import logger
+from services.email import email_service
+
 # set up logger 
 router = APIRouter() 
 
@@ -93,102 +92,37 @@ async def get_company_job_info(company: str, job_position: str):
     try:
         response = json.loads(string_to_json(response))
     except Exception as e:
-        print("ERROR RESPONSE", e)
+        logger.error(f"ERROR RESPONSE {e}")
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     try:
         response = JobInformation(**response)
     except Exception as e:
-        print("ERROR RESPONSE", e)
+        logger.error(f"ERROR RESPONSE {e}")
         raise HTTPException(status_code=500, detail="Response validation failed")
 
     return response
 
+
+
 @router.post("/company-job-info-crew-ai")
 async def get_company_job_info( email_id: str = Body(...), authorization: str = Header(...) ):
-    email_response = await getEmail(authorization, email_id)
-    results = decode_email_parts(email_response['payload']['parts'])[0]
+    logger.info("INFO CREW AI CALLED")
+    
+    # Step 1: Get email content
+    email_response = await email_service.get_email(authorization, email_id)
     user_id = email_response['payload']['headers'][0]['value']
-    summary_json:GPT_Email_Summary_Response = await email_summary_service.email_summary(results)
-
+    summary_json: GPT_Email_Summary_Response = await email_service.get_email_summary(email_response)
+    
+    # Step 2: Process job application based on status using match-case
     match(summary_json.status): 
         case Status.IN_REVIEW | Status.INTERVIEWING:
-            query_key = summary_json.company+summary_json.job_position
-            if await memo_service.query_exists(query_key):
-                response_dict = await memo_service.get_response_for_query(query_key)
-                try:
-                    response_format = JobInformation(**response_dict)
-                except Exception as e:
-                    print("ERROR RESPONSE", e)
-                    raise HTTPException(status_code=500, detail="Response validation failed")
-            else: 
-                inputs = {
-                    'company': summary_json.company,
-                    'job': summary_json.job_position,
-                    'summary': summary_json.summary,
-                    "status": str(summary_json.status)
-                }
-                try:
-                    response_format:JobInformation = await crewai_table_service.crewai_table(query_key=query_key, inputs=inputs)
-                except Exception as e:
-                    raise HTTPException(status_code=500, detail="Response validation failed")
-           
-            user_service_response = await user_service.get_user_excel_from_db(user_id=user_id)
-            if user_service_response is None:
-                row = 2
-                data = {
-                    "properties": { "title": "BACKEND JobHuntingTest" }
-                }
-                res = await sheets.createSheet(authorization, data)
-                excel_id = res['spreadsheetId']
-                await user_service.save_user_info_to_db(user_id=user_id,
-                                                        current_sheet_row=1, 
-                                                        excel_id=res['spreadsheetId'])
-            else :
-               
-                row  = user_service_response["current_sheet_row"]
-                excel_id = user_service_response["excel_id"]
+            await job_status_service.handle_in_review_or_interview(summary_json,user_id, authorization)
+            return {"message": "Job info successfully updated"}
 
-            sheets_data = {
-                "valueInputOption": "USER_ENTERED",
-                "data": [],
-                "includeValuesInResponse": "false",
-                "responseValueRenderOption": "FORMATTED_VALUE",
-                "responseDateTimeRenderOption": "SERIAL_NUMBER"
-            }
-            if row == 2:
-                headerDataItem = {
-                        "range": f"{HEADER_COLUMNS[0]}1:{HEADER_COLUMNS[-1]}1",
-                        "majorDimension": "ROWS",
-                        "values": [HEADER_NAMES]
-                    }
-                sheets_data["data"].append(headerDataItem)
-
-
-            content_strings = get_columns_content_strings(response_format.results)
-            row_values = [
-                summary_json.company,           
-                summary_json.job_position,      
-                str(summary_json.status.name),  
-                content_strings["job_description"],
-                content_strings["pay_range"],
-                content_strings["interview_process"],
-                content_strings["example_interview_experience"]
-            ]
-
-            
-            rowDataItem = {
-                "range": f"{HEADER_COLUMNS[0]}{row}:{HEADER_COLUMNS[-1]}{row}",
-                "majorDimension": "ROWS",
-                "values": [row_values]
-            }
-            sheets_data["data"].append(rowDataItem)
-            
-            res = await sheets.updateSheet(authorization, sheets_data, excel_id)
-            await user_service.update_user_row(user_id=user_id, current_sheet_row=row+1)
-
-            
         case Status.OFFER | Status.REJECTED:
-            return " UPDATE DATABASE"
+            msg = await job_status_service.handle_offer_or_rejection(summary_json, user_id, authorization)
+            return {"message": msg}
         case _:
             raise HTTPException(status_code=500, detail="Response validation failed")
+        

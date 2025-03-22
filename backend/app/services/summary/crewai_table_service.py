@@ -2,7 +2,7 @@ from services.clients.crew_client import TableMakerCrew
 from services.memory import memo_service
 import asyncio
 from models.create_table import JobInformation
-from fastapi import HTTPException
+from config.logger import logger
 
 async def crewai_table(query_key:str, inputs:dict):
     try:
@@ -11,5 +11,6 @@ async def crewai_table(query_key:str, inputs:dict):
         response_format = JobInformation(**result.json_dict)
         return response_format
     except Exception as e:
-        print("ERROR RESPONSE", e)
-        raise RuntimeError from e
+        logger.error(f"ERROR RESPONSE: {e}")
+        raise Exception from e
+    
