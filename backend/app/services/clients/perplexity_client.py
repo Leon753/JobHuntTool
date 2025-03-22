@@ -44,7 +44,7 @@ class PerplexityClient:
         except Exception as e:
             logger.error(f"❌ API request failed: {e}")
             return None
-        
+
     async def get_response(self, messages:list, response_format: dict=None, timeout: int = 120) -> str:
         """
         Async function to get response from Perplexity API.
