@@ -13,7 +13,7 @@ company_corporate_research_task:
       - Public perception & brand reputation.
       - Notable awards or industry recognitions.
   expected_output: >
-    Produce a 10 bullet point report covering the company's overview and corporate history, with all sources cited via URLs.
+    Produce a 5 bullet point report covering the company's overview and corporate history, with all sources cited via URLs.
   agent: company_corporate_researcher
 
 # Task 2: Mission, Vision, and Strategic Goals
@@ -29,7 +29,7 @@ mission_vision_research_task:
       - Company culture, values, and employee experience.
       - CSR initiatives and sustainability/ethical commitments.
   expected_output: >
-    Generate a 10 bullet point  report on {company}'s mission, vision, and corporate strategy, including direct references and URLs.
+    Generate a 5 bullet point  report on {company}'s mission, vision, and corporate strategy, including direct references and URLs.
   agent: mission_vision_researcher
 
 # Task 3: Market Position & Financials
@@ -45,7 +45,7 @@ financial_market_research_task:
       - Customer or market feedback.
       - Future growth predictions and market trends.
   expected_output: >
-    Produce a 10 bullet point  financial and market overview with factual data and multiple reputable sources, complete with URLs.
+    Produce a 5 bullet point  financial and market overview with factual data and multiple reputable sources, complete with URLs.
   agent: financial_market_researcher
 
 # Task 4: Job Role, Responsibilities, and Interview Process
@@ -61,7 +61,7 @@ job_role_research_task:
       - Common challenges in the role.
       - What makes a candidate successful in this role.
   expected_output: >
-    Generate a 10 bullet point  report detailing job responsibilities, required skills, and the interview process, with direct quotes and source URLs.
+    Generate a 5 bullet point  report detailing job responsibilities, required skills, and the interview process, with direct quotes and source URLs.
   agent: job_role_researcher
 
 # Task 5: Compensation, Career Growth, and Workplace Culture
@@ -76,7 +76,7 @@ compensation_career_culture_research_task:
       - Training and professional development programs.
       - Employee feedback on work-life balance, diversity, equity, and inclusion, and overall satisfaction.
   expected_output: >
-    Produce a 10 bullet point  report on compensation, career progression, and workplace culture, supported by data and reputable source URLs.
+    Produce a 5 bullet point  report on compensation, career progression, and workplace culture, supported by data and reputable source URLs.
   agent: compensation_career_culture_researcher
 
 # Task 6: Data Sources & References Aggregation
@@ -86,7 +86,7 @@ references_research_task:
 
     Gather and compile all the sources and references used across the previous tasks, organized by section.
   expected_output: >
-    Provide a 10 bullet point , well-organized list of sources with direct URLs for verification.
+    Provide a 5 bullet point , well-organized list of sources with direct URLs for verification.
   agent: references_researcher
 
 
@@ -95,7 +95,9 @@ references_research_task:
 reporting_task:
   description: >
     Convert the **full** research report into a structured JSON format for automated job tracking.
-
+    ****
+    {research}
+    ****
     The JSON will be sent to our **Google Sheets API** for visualization and tracking. 
     Ensure that all details are captured **without any summarization or loss of information**.
     

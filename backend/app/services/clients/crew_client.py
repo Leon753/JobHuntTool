@@ -54,7 +54,7 @@ def create_agent_from_yaml(agent_name: str, tools:list=None) -> Agent:
     Expects agents_config to be a dict with agent names as keys.
     Each agent config can include keys such as role, goal, backstory, llm, and tools.
     """
-    print("WE ARE CREATING AN AGENT")
+
     logger.debug(f"Available agent keys: {list(agents_config.keys())}")
     config = agents_config.get(agent_name)
 
@@ -64,14 +64,18 @@ def create_agent_from_yaml(agent_name: str, tools:list=None) -> Agent:
     # Create the Agent instance.
     # The Agent constructor accepts a config dict, a verbosity flag, and an optional list of tools.
     # print("config {agent_name}" , config)
-
-
+    if tools is None:
+        return Agent(
+            config=config,
+            verbose=True,
+            max_iter=2,
+        )
     return Agent(
-        config=config,
-        verbose=True,
-        tools=tools,
-        max_iter=1,
-    )
+            config=config,
+            verbose=True,
+            max_iter=1,
+            tools=tools
+        )
 
 def create_task_from_yaml(task_name: str) -> Task:
     """
@@ -125,7 +129,6 @@ class TableMakerCrew():
     
     @agent
     def mission_vision_researcher(self) -> Agent:
-        print("we are in mission ")
         return create_agent_from_yaml("mission_vision_researcher", [Tools["perplexity_search_tool"]])
     @task
     def mission_vision_researcher_task(self) -> Task:
@@ -204,7 +207,7 @@ class CompanyResearcher():
     
     @agent
     def company_corporate_researcher(self) -> Agent:
-        return create_agent_from_yaml("company_corporate_researcher")
+        return create_agent_from_yaml("company_corporate_researcher",[Tools["perplexity_search_tool"]])
       # @agent
     @task
     def company_corporate_research_task(self) -> Task:
@@ -241,7 +244,7 @@ class MissionResearcher():
     @agent
     def mission_vision_researcher(self) -> Agent:
         print("we are in mission ")
-        return create_agent_from_yaml("mission_vision_researcher")
+        return create_agent_from_yaml("mission_vision_researcher", [Tools["perplexity_search_tool"]])
     @task
     def mission_vision_researcher_task(self) -> Task:
         return Task(
@@ -260,6 +263,7 @@ class MissionResearcher():
             process=Process.sequential,
             verbose=True,
         )
+    
 @CrewBase
 class FinancialResearcher():
     @before_kickoff
@@ -275,11 +279,8 @@ class FinancialResearcher():
 
     @agent
     def financial_market_researcher(self) -> Agent:
-        try: 
-            agent = create_agent_from_yaml("financial_market_researcher")
-        except Exception as e:
-            logger.error(e)
-        return agent
+        return create_agent_from_yaml("financial_market_researcher", [Tools["perplexity_search_tool"]])
+        
     @task
     def financial_market_researcher_task(self) -> Task:
         return Task(
@@ -314,7 +315,7 @@ class JobRoleResearcher():
     
     @agent 
     def job_role_researcher(self) -> Agent:
-        return create_agent_from_yaml("job_role_researcher")
+        return create_agent_from_yaml("job_role_researcher", [Tools["perplexity_search_tool"]])
     @task
     def job_role_researcher_task(self) -> Task:
         return Task(
@@ -348,7 +349,7 @@ class CompensationAndCultureResearcher():
    
     @agent
     def compensation_career_culture_researcher(self) -> Agent:
-        return create_agent_from_yaml("compensation_career_culture_researcher")
+        return create_agent_from_yaml("compensation_career_culture_researcher", [Tools["perplexity_search_tool"]])
     @task
     def compensation_career_culture_researcher_task(self) -> Task:
         return Task(
@@ -359,16 +360,6 @@ class CompensationAndCultureResearcher():
         )
 
   
-    def reporting_analyst(self) -> Agent:
-        return create_agent_from_yaml("reporting_analyst")
-    @task
-    def reporting_task(self) -> Task:
-        return Task(
-            description=tasks_config['reporting_task']['description'],
-            expected_output=tasks_config['reporting_task']['expected_output'],
-            agent=self.reporting_analyst(),
-            output_json=JobInformation,
-        )
     @crew
     def crew(self) -> Crew:
         """Creates the LatestAiDevelopment crew"""
@@ -395,7 +386,7 @@ class Reporter():
     
     @agent
     def reporting_analyst(self) -> Agent:
-        return create_agent_from_yaml("reporting_analyst")
+        return create_agent_from_yaml("reporting_analyst",tools=None)
     @task
     def reporting_task(self) -> Task:
         return Task(
