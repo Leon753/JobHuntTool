@@ -6,11 +6,18 @@ from config.logger import logger
 
 async def crewai_table(query_key:str, inputs:dict):
     try:
-        result = await asyncio.to_thread(TableMakerCrew().crew().kickoff, inputs) 
+        print("here1")
+        crew  = TableMakerCrew()
+        print("here2")
+        crew = crew.crew()
+        print("here3")
+        result = await asyncio.to_thread(crew.kickoff, inputs) 
         await memo_service.save_query_response(query_key, result.json_dict)
         response_format = JobInformation(**result.json_dict)
         return response_format
-    except Exception as e:
-        logger.error(f"ERROR RESPONSE: {e}")
+    except BaseException as e:
+        logger.error(f"ERROR RESPONSE: from crew ai kickoff {e}")
         raise Exception from e
+    
+       
     
