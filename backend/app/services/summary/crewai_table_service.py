@@ -1,19 +1,20 @@
-from services.clients.crew_client import *
+
 from services.memory import memo_service
 import asyncio
 from models.create_table import JobInformation
 from config.logger import logger
 from crewai.crews import CrewOutput
-
+from services.clients.crew_client.agents import company_researcher_agent, financial_researcher_agent, compensation_researcher_agent, reporter_agent
+from services.clients.crew_client.agents import interview_researcher_agent, job_role_researcher_agent, reference_researcher_agent, mission_researcher_agent
 class Crew_Wrapper(): 
     def __init__(self):
         # Create instances for each Crew
-        self.company_researcher_instance = CompanyResearcher()
-        self.mission_researcher_instance = MissionResearcher()
-        self.financial_researcher_instance = FinancialResearcher()
-        self.job_role_researcher_instance = JobRoleResearcher()
-        self.compensation_researcher_instance = CompensationAndCultureResearcher()
-        self.reporter_instance = Reporter()
+        self.company_researcher_instance = company_researcher_agent.CompanyResearcher()
+        self.mission_researcher_instance = mission_researcher_agent.MissionResearcher()
+        self.financial_researcher_instance = financial_researcher_agent.FinancialResearcher()
+        self.job_role_researcher_instance = job_role_researcher_agent.JobRoleResearcher()
+        self.interview_reseacher = interview_researcher_agent.InterviewReseacher()
+        self.reporter_instance = reporter_agent.Reporter()
     
     async def run_tasks(self, inputs: dict) -> CrewOutput:
         """
@@ -23,7 +24,7 @@ class Crew_Wrapper():
                 self.company_researcher_instance.crew().kickoff_async(inputs=inputs),
                 self.mission_researcher_instance.crew().kickoff_async(inputs=inputs),
                 self.job_role_researcher_instance.crew().kickoff_async(inputs=inputs),
-                self.compensation_researcher_instance.crew().kickoff_async(inputs=inputs),
+                self.interview_reseacher.crew().kickoff_async(inputs=inputs),
         ]
         logger.info("Starting all crews concurrently.")
         all_results = await asyncio.gather(*tasks)
