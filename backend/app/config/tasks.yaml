@@ -89,6 +89,15 @@ references_research_task:
     Provide a 5 bullet point , well-organized list of sources with direct URLs for verification.
   agent: references_researcher
 
+# Task 6: Interview Preparation Sources & References Aggregation
+interview_prep_references_task:
+  description: >
+    [CHAIN OF THOUGHT: Review all outputs from previous interview‑prep tasks. Extract every cited interview experience, question, answer, preparation tip, and their URLs. Organize them into clear sections (Technical Questions, Behavioral Questions, Interview Format, Company Insights, Preparation Resources). DO NOT include these internal thoughts in your final output.]
+
+    Compile a structured, section‑by‑section bibliography of all sources used to prepare candidates for the {job} role at {company}.
+  expected_output: >
+    Provide a concise, 5‑bullet summary. Each bullet should name one section and list 2–3 direct URLs to credible sources for verification and deeper reading.
+  agent: interview_preparation_researcher
 
 
 
