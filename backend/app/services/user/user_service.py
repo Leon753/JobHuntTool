@@ -22,8 +22,6 @@ async def update_user_row(user_id: str, current_sheet_row: int):
         )
         await db.commit()
 
-
-
 async def get_user_excel_from_db(user_id: str):
     async with aiosqlite.connect(DATABASE) as db:
         db.row_factory = aiosqlite.Row
