@@ -21,3 +21,24 @@ export async function getAuthToken(): Promise<string> {
     return tryGetToken();
   }
 }
+
+export async function getUserEmail(): Promise<string> {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user info: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.email; // The email address of the authenticated user
+  } catch (error) {
+    console.error("Error fetching user email:", error);
+    throw error;
+  }
+}
