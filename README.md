@@ -33,7 +33,7 @@ pip install poetry
 
 ### 3. Install Project Dependencies
 ```bash
-poetry install
+poetry install --no-root
 ```
 
 ### 4. Run Server
