@@ -54,9 +54,13 @@ class AzureAIClient(LLMClientBase):
                     delay = self.base_delay * (2 ** attempt) + random.uniform(0, 0.5)
                     logger.info(f"Rate limited (429). Retrying in {delay:.2f} seconds...")
                     await asyncio.sleep(delay)
+                
                 else:
                     response.raise_for_status()  # Raise error for other status codes
-
+            except httpx.ReadTimeout as e:
+                delay = self.base_delay * (2 ** attempt) + random.uniform(0, 0.5)
+                logger.info(f"ReadTimeout encountered. Retrying in {delay:.2f} seconds...")
+                await asyncio.sleep(delay)
             except httpx.HTTPStatusError as e:
                 raise Exception(f"Request failed: {e.response.status_code} - {e.response.text}") from e
                
@@ -98,7 +102,13 @@ class GPTCompletionClient(AzureAIClient):
         return msgs
 
 class GPTChatCompletionClient(AzureAIClient):
-    def __init__(self, api, base_url, deployment_name, api_version, response_manager=None):
+    def __init__(
+        self, 
+        api, 
+        base_url, 
+        deployment_name, 
+        api_version, 
+        response_manager=None):
         super().__init__(api, base_url, api_version=api_version, deployment_name=deployment_name, response_manager=response_manager)
         self.uri = f"{self.base_url}/openai/deployments/{self.deployment_name}/chat/completions?api-version={self.api_version}"
         

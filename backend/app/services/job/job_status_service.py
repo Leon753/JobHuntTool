@@ -12,7 +12,7 @@ async def handle_in_review_or_interview(
     user_id: str,
     authorization: str
 ) -> None:
-    query_key = summary_json.company + summary_json.job_position
+    query_key = summary_json.company + summary_json.job_position+" " +" " + " " + " "
     # 1) Get or create job info (from memo or CrewAI)
     response: JobInformation = await job_info_service.get_or_create_job_info(query_key, summary_json)
 
