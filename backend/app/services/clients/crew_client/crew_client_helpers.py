@@ -18,7 +18,7 @@ OUTPUT_JSON = {
     "JobInformation": JobInformation
 }
 
-def create_agent_from_yaml(agent_name: str, tools:list=None) -> Agent:
+def create_agent_from_yaml(agent_name: str, tools:list=None, max_iter = 2) -> Agent:
     """
     Factory method to create an Agent from a YAML config.
     Expects agents_config to be a dict with agent names as keys.
@@ -38,12 +38,12 @@ def create_agent_from_yaml(agent_name: str, tools:list=None) -> Agent:
         return Agent(
             config=config,
             verbose=True,
-            max_iter=2,
+            max_iter=max_iter,
         )
     return Agent(
             config=config,
             verbose=True,
-            max_iter=3,
+            max_iter=max_iter,
             tools=tools
         )
 

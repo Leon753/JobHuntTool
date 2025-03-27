@@ -13,3 +13,4 @@ env/*
 *.db
 backend/app/output/*
 app.log
+manifest.json

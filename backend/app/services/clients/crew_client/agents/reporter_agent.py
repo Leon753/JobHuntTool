@@ -18,7 +18,7 @@ class Reporter():
     
     @agent
     def reporting_analyst(self) -> Agent:
-        agent = create_agent_from_yaml("reporting_analyst",tools=None)
+        agent = create_agent_from_yaml("reporting_analyst",tools=None, max_iter=1)
         agent.llm = LLM(
             model="azure/gpt-4-32k",
             api_version="2025-01-01-preview",
