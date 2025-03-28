@@ -2,8 +2,15 @@
 
 ## Setup
 
-- npm install
-- npm run build
+```bash
+npm install
+```
+```bash
+npm run build
+```
+
+
+
 - Go to 'chrome://extensions/' on Google Chrome
 - Click on 'Load Unpacked'
 - Choose the `dist` folder
