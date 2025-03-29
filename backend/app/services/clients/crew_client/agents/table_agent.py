@@ -21,24 +21,14 @@ class TableMakerCrew():
         return create_agent_from_yaml("compensation_career_culture_researcher", [Tools["perplexity_search_tool"]])
     @task
     def compensation_career_culture_researcher_task(self) -> Task:
-        return Task(
-            config=tasks_config['compensation_career_culture_research_task'],
-            description=tasks_config['compensation_career_culture_research_task']['description'],
-            expected_output=tasks_config['compensation_career_culture_research_task']['expected_output'],
-            agent=self.compensation_career_culture_researcher()
-        )
+        return create_task_from_yaml("compensation_career_culture_research_task", agent=self.compensation_career_culture_researcher())
     
     @agent 
     def job_role_researcher(self) -> Agent:
         return create_agent_from_yaml("job_role_researcher", [Tools["perplexity_search_tool"]])
     @task
     def job_role_researcher_task(self) -> Task:
-        return Task(
-            config=tasks_config['job_role_research_task'],
-            description=tasks_config['job_role_research_task']['description'],
-            expected_output=tasks_config['job_role_research_task']['expected_output'],
-            agent=self.job_role_researcher()
-        )
+        return create_task_from_yaml("job_role_research_task", agent=self.job_role_researcher())
     
     @agent
     def interview_preparation_researcher(self) -> Agent:
@@ -52,16 +42,15 @@ class TableMakerCrew():
         return create_agent_from_yaml("reporting_analyst", tools=None, max_iter=3)
     @task
     def reporting_task(self) -> Task:
-        return Task(
-            description=tasks_config['reporting_task']['description'],
-            expected_output=tasks_config['reporting_task']['expected_output'],
-            agent=self.reporting_analyst(),
-            output_json=JobInformation,
-            context=[self.compensation_career_culture_researcher_task(), 
-                     self.job_role_researcher_task(),
-                     self.interview_prep_task()], # TODO: add context here
-            
-        )
+        return create_task_from_yaml("interview_reporting_taskprep_task",
+                                     agent=self.reporting_analyst(),
+                                     output_json=JobInformation,
+                                     context=[
+                                        self.compensation_career_culture_researcher_task(), 
+                                        self.job_role_researcher_task(),
+                                        self.interview_prep_task()]
+                                    )
+    @agent
     
     @crew
     def crew(self) -> Crew:
@@ -71,7 +60,6 @@ class TableMakerCrew():
             agents=self.agents, # Automatically created by the @agent decorator
             tasks=self.tasks, # Automatically created by the @task decorator
             verbose=True,
-            memory=True, 
             planning=True,
             manager_llm="azure/gpt-4o",
             planning_llm="azure/gpt-4o"
