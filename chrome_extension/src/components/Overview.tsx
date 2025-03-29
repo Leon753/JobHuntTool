@@ -49,8 +49,12 @@ function Overview() {
         </div>
 
         {/* Button that links to job spreadsheet */}
+        <div className="flex flex-col items-start gap-2">
         {spreadSheetUrl && 
-            <a href={`https://docs.google.com/spreadsheets/d/${spreadSheetUrl ?? ""}/edit?gid=0#gid=0`} target="_blank">
+            <a href={`https://docs.google.com/spreadsheets/d/${spreadSheetUrl}/edit?gid=0#gid=0`} 
+            target="_blank"
+            
+            >
                 <Button 
                     variant="outlined" 
                     className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 transition-colors" 
@@ -60,6 +64,10 @@ function Overview() {
                 </Button>
             </a>
         }
+        <span className="flex text-sm text-gray-500 italic">
+            This will create a new Job Sheet if you haven't logged in before.
+        </span>
+        </div>
       </div>
     </div>
   );
