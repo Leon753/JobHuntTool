@@ -1,136 +1,105 @@
-research_task:
+# Task 1: Company & Corporate Information
+company_corporate_research_task:
   description: >
-    Conduct **comprehensive and unbiased research** on {job} {company}.  
-    A SUMMARY HAS ALREADY BEEN PROVIDED: {summary}.
+    [CHAIN OF THOUGHT: Begin by retrieving the company's official details (name, founding year, headquarters) from its official website and reputable news sources. Then identify the founders and key executives using press releases and reliable biographies. Next, list the major business divisions, historical milestones, notable achievements, and recent innovations. Finally, document public perception, brand reputation, and any awards or recognitions with source URLs. DO NOT include these internal thoughts in your final output.]
 
-    Collect **detailed, factual, and cross-verified** insights, ensuring that:
-    - **No summarization occurs**—retain all relevant details.
-    - **Information is pulled from multiple reputable sources.**
-    - **No bias is introduced; report purely factual findings.**
-    - **All sources are cited with URLs.**
-
-    The research must include the following structured sections:
-
-    ### **1. Company Overview**
-    **Subtasks:**
-    - Retrieve **official company name, founding year, and headquarters**.  
-    - Identify **founders & key executives** (CEO, leadership).  
-    - Outline **major business divisions and core products/services**.  
-    - Provide **historical milestones & notable achievements**.  
-    - Analyze **recent innovations & upcoming projects**.  
-    - Describe **public perception & brand reputation**.  
-    - List **notable awards or industry recognitions**.  
-
-    ### **2. Company Mission & Vision**
-    **Subtasks:**
-    - Extract the **official mission & vision statements**.  
-    - Explain how the company’s **strategic goals align with its mission**.  
-    - Describe how the **company differentiates itself from competitors**.  
-    - Include insights on **company culture, values, and employee experience**.  
-    - Summarize **corporate social responsibility (CSR) initiatives**.  
-    - Identify **sustainability or ethical commitments**.  
-
-    ### **3. Market Position & Financials**
-    **Subtasks:**
-    - Summarize **industry standing & market share trends**.  
-    - Analyze **yearly revenue & financial growth**.  
-    - Document **major funding rounds, investors, and valuation history**.  
-    - Compare **business segments profitability & competitive landscape**.  
-    - Identify **key competitors and industry benchmarking**.  
-    - Extract **customer or market feedback (from reviews, analyst reports, forums, etc.)**.  
-    - Summarize **future growth predictions & market trends**.  
-
-    ### **4. Job Details**
-    **Subtasks:**
-    - Extract **exact job title & department**.  
-    - Outline **day-to-day responsibilities & major tasks**.  
-    - Explain **core areas of focus**.  
-    - Describe **team collaboration (cross-functional teams, reporting structure)**.  
-    - Identify **location expectations (onsite, hybrid, remote work policies)**.  
-    - Identify **common challenges in the role (from insider reviews)**.  
-    - Provide insights on **what makes a candidate successful in this role**.  
-
-    ### **5. Required Skills**
-    **Subtasks:**
-    - List **minimum qualifications & degree requirements**.  
-    - Detail **specific skills required for the role**.  
-    - Identify **soft skills & personality traits valued by the company**.  
-    - Gather insights on **what hiring managers prioritize in candidates**.  
-    - Identify **emerging skills or trends affecting this role**.  
-    - Compare skills to **similar roles in different companies**.  
-
-    ### **6. Interview Process**
-    **Subtasks:**
-    - Describe the **number of interview rounds & overall process timeline**.  
-    - Explain the **types of interviews** (behavioral, technical, case studies, assessments).  
-    - List **example questions from real interviews**.  
-    - Mention **online platforms used for tests (HackerRank, in-house assessments, etc.)**.  
-    - Detail **what candidates typically struggle with**.  
-    - Include **insider tips from past candidates**.  
-    - Identify **common reasons for rejection**.  
-
-    ### **7. Real-World Interview Experiences**
-    **Subtasks:**
-    - Collect **candidate feedback from Blind, Glassdoor, LinkedIn discussions**.  
-    - Summarize **successful vs. unsuccessful candidate experiences**.  
-    - Identify **key pain points in the hiring process**.  
-    - Highlight **common red flags that lead to rejection**.  
-    - Extract **hiring manager feedback or recruiter insights**.  
-    - Identify **variability in hiring practices across teams/departments**.  
-
-    ### **8. Salary Range & Benefits**
-    **Subtasks:**
-    - Extract **salary data from Levels.fyi, Glassdoor, PayScale**.  
-    - Provide a **range for junior, mid, and senior roles**.  
-    - Outline **benefits (stock options, retirement plans, healthcare, parental leave, relocation, etc.)**.  
-    - Compare salaries **against industry benchmarks**.  
-    - Identify **performance-based incentives & bonuses**.  
-    - Summarize **negotiation strategies & salary trends**.  
-
-    ### **9. Career Growth Potential**
-    **Subtasks:**
-    - Analyze **career progression opportunities within the company**.  
-    - List **internal mobility options (switching departments, leadership pathways, mentorship programs)**.  
-    - Provide insights on **training & professional development programs**.  
-    - Identify **real examples of employees who moved up the ranks**.  
-    - Compare **career growth prospects vs. other companies**.  
-    - Identify **external opportunities available to candidates with this experience**.  
-
-    ### **10. Example Technical Questions**
-    **Subtasks:**
-    - Retrieve **common technical interview questions**.  
-    - Categorize into **problem-solving, system design, optimization, algorithms, case studies, etc.**.  
-    - Provide **real-world examples & expected answer approaches**.  
-    - Include **LeetCode-style or case study questions used in past interviews**.  
-    - Identify **trends in technical assessments over time**.  
-
-    ### **11. Diversity, Equity, and Inclusion (DEI)**
-    **Subtasks:**
-    - Analyze the companys **diversity policies & hiring statistics**.  
-    - Extract **DEI initiatives & programs**.  
-    - Summarize **employee satisfaction with DEI efforts**.  
-    - Compare DEI efforts **with competitors in the industry**.  
-
-    ### **12. Work-Life Balance & Employee Satisfaction**
-    **Subtasks:**
-    - Retrieve **employee feedback from reviews, forums, and surveys**.  
-    - Identify **common complaints or praises regarding work-life balance**.  
-    - Extract **company policies on PTO, work hours, flexibility, etc.**.  
-    - Compare **employee satisfaction ratings with industry standards**.  
-
-    ### **13. Data Sources & References**
-    **Subtasks:**
-    - Ensure **every section cites multiple sources**.  
-    - Prioritize **trusted sources such as official company pages, SEC filings, Levels.fyi, Glassdoor, LinkedIn discussions, and industry reports**.  
-    - Provide **direct URLs** for further verification.  
-
+    Conduct comprehensive research on {company} focusing on its corporate background and overall identity.
+    Collect detailed, factual, and cross-verified insights about:
+      - Official company name, founding year, and headquarters.
+      - Founders & key executives (CEO, leadership).
+      - Major business divisions and core products/services.
+      - Historical milestones & notable achievements.
+      - Recent innovations & upcoming projects.
+      - Public perception & brand reputation.
+      - Notable awards or industry recognitions.
   expected_output: >
-    Generate a **detailed, structured research report** covering all required sections **without summarization or data loss**.
-    Ensure:
-    - **No information is omitted or overly condensed.**
-    - **All sections include in-depth explanations and real-world data.**
-    - **Sources are explicitly cited at the end with full URLs.**
-  agent: researcher
+    Produce a 5 bullet point report covering the company's overview and corporate history, with all sources cited via URLs.
+  agent: company_corporate_researcher
+
+# Task 2: Mission, Vision, and Strategic Goals
+mission_vision_research_task:
+  description: >
+    [CHAIN OF THOUGHT: Start by extracting the official mission and vision statements from the company's official resources. Then analyze press releases and interviews to understand the strategic goals and how they align with these statements. Next, compare the company's differentiation strategies and gather insights on its culture, CSR, and sustainability initiatives. DO NOT include these internal thoughts in your final output.]
+
+    Research and compile detailed information about {company}'s mission, vision, and strategic goals.
+    website: reddit, yahoo, cnn, msbnc, blind, {company} website
+    Gather insights on:
+      - Official mission & vision statements.
+      - Alignment of strategic goals with the mission.
+      - How the company differentiates itself from competitors.
+      - Company culture, values, and employee experience.
+      - CSR initiatives and sustainability/ethical commitments.
+  expected_output: >
+    Generate a 5 bullet point  report on {company}'s mission, vision, and corporate strategy, including direct references and URLs.
+  agent: mission_vision_researcher
+
+# Task 3: Market Position & Financials
+financial_market_research_task:
+  description: >
+    [CHAIN OF THOUGHT: Gather financial and market data from official reports, news articles, and industry analyses. Identify key metrics such as yearly revenue, funding rounds, valuation history, and market share trends. Compare this data against competitors and incorporate customer feedback or analyst reports. DO NOT include these internal thoughts in your final output.]
+
+    Research {company}'s market standing and financial performance. Focus on:
+      - Industry standing and market share trends.
+      - Yearly revenue and financial growth.
+      - Major funding rounds, investors, and valuation history.
+      - Profitability across business segments and competitive benchmarking.
+      - Customer or market feedback.
+      - Future growth predictions and market trends.
+  expected_output: >
+    Produce a 5 bullet point  financial and market overview with factual data and multiple reputable sources, complete with URLs.
+  agent: financial_market_researcher
+
+# Task 4: Job Role, Responsibilities, and Interview Process
+job_role_research_task:
+  description: >
+    [CHAIN OF THOUGHT: Begin by extracting the official job description for the {job} role from {company}'s career page. Supplement this with insights from employee reviews and third-party platforms. Break down the day-to-day responsibilities, required skills, and typical challenges. Additionally, document the interview process, including rounds, types of interviews, sample questions, and candidate experiences. DO NOT include these internal thoughts in your final output.]
+    websites: {company} website, workday, reddit, 
+    Conduct in-depth research on the {job} role at {company}. Focus on:
+      - Exact job title, department, and day-to-day responsibilities.
+      - Core areas of focus and major tasks.
+      - Team collaboration and reporting structure.
+      - Location expectations (onsite, hybrid, remote).
+      - Common challenges in the role.
+      - What makes a candidate successful in this role.
+  expected_output: >
+    Generate a 5 bullet point  report detailing job responsibilities, required skills, and the interview process, with direct quotes and source URLs.
+  agent: job_role_researcher
+
+# Task 5: Compensation, Career Growth, and Workplace Culture
+compensation_career_culture_research_task:
+  description: >
+    [CHAIN OF THOUGHT: Collect salary data and benefits information from reliable salary websites, employee reviews, and official sources. Compare compensation levels across different experience tiers. Also, gather data on career growth opportunities, internal mobility, and training programs. Finally, review employee feedback on work-life balance, DEI initiatives, and overall workplace satisfaction. DO NOT include these internal thoughts in your final output.]
+    websites: levels.fyi, reddit, yahoo, cnn, msbnc, blind, {company} website
+    Research the compensation and career prospects for the {job} role at {company}, as well as the overall workplace culture. Focus on:
+      - Salary ranges for junior, mid, and senior levels.
+      - Benefits such as stock options, retirement plans, healthcare, and bonuses.
+      - Career growth potential and internal mobility options.
+      - Training and professional development programs.
+      - Employee feedback on work-life balance, diversity, equity, and inclusion, and overall satisfaction.
+  expected_output: >
+    Produce a 5 bullet point  report on compensation, career progression, and workplace culture, supported by data and reputable source URLs.
+  agent: compensation_career_culture_researcher
+
+# Task 6: Data Sources & References Aggregation
+references_research_task:
+  description: >
+    [CHAIN OF THOUGHT: Review all outputs from the previous tasks. Extract all cited sources and URLs, and organize them by section (e.g., Company Overview, Mission & Vision, Financials, Job Role, Compensation). Ensure each section includes multiple credible references. DO NOT include these internal thoughts in your final output.]
+
+    Gather and compile all the sources and references used across the previous tasks, organized by section.
+  expected_output: >
+    Provide a 5 bullet point , well-organized list of sources with direct URLs for verification.
+  agent: references_researcher
+
+# Task 6: Interview Preparation Sources & References Aggregation
+interview_prep_task:
+  description: >
+    [CHAIN OF THOUGHT: Search through reddit & blind for ways people prepared for the interview]
+    websites: reddit, blind , cnn, yahoo, msbnc
+    Compile a structured, section‑by‑section bibliography of all sources used to prepare candidates for the {job} role at {company}.
+  expected_output: >
+    Provide a concise, 5‑bullet summary. Each bullet should name one section and list 2–3 direct URLs to credible sources for verification and deeper reading.
+  agent: interview_preparation_researcher
+
 
 
 reporting_task:
@@ -181,4 +150,5 @@ reporting_task:
                 }}
             }}
   agent: reporting_analyst
+  output_json: JobInformation
 

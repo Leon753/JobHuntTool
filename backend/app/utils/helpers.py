@@ -2,6 +2,7 @@ import base64
 import re
 from models.create_table import Columns , JobInformation
 from models.email_summary import GPT_Email_Summary_Response
+from config.logger import logger
 def string_to_json(response):
     cleaned = re.sub(r"^```json\s*", "", response)
     cleaned = re.sub(r"\s*```$", "", cleaned)
@@ -19,6 +20,11 @@ def get_columns_content_strings(columns: Columns) -> dict[str, str]:
         # 'data' is a dict with keys: status, content, source.
         # We join the items in the 'content' list.
         content_list = data.get("content", [])
+        # TODO: THIS IS A BUG
+        if len(content_list) == 0:
+            logger.warning("THERE IS AN EMPTY OUTPUT FROM REPORTING AGENT: MEANING THE SECTION WILL BE EMPTY")
+            result[column_name] = [" "]
+            continue
         content_list[0] = "*" + content_list[0]
         result[column_name] = "\n*".join(content_list)
     return result

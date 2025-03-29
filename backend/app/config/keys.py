@@ -11,4 +11,5 @@ TEXT_EMBEDDINGS_API_BASE = os.getenv("TEXT_EMBEDDINGS_API_BASE")
 TEXT_EMBEDDINGS_API_VERSION = os.getenv("TEXT_EMBEDDINGS_API_VERSION")
 CHAT_VERSION = "2024-08-01-preview"  # Update if needed
 CHAT_DEPLOYMENT_NAME = "gpt-4o"  # Replace with your deployed model name
+GPT4_KEY = os.getenv("GPT4_KEY")
 
