@@ -1,6 +1,5 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
-from crewai import LLM
 from config.logger import logger
 from services.clients.crew_client.crew_client_helpers import * 
 from config.keys import GPT4_KEY
@@ -18,13 +17,7 @@ class Reporter():
     
     @agent
     def reporting_analyst(self) -> Agent:
-        agent = create_agent_from_yaml("reporting_analyst",tools=None, max_iter=1)
-        agent.llm = LLM(
-            model="azure/gpt-4-32k",
-            api_version="2025-01-01-preview",
-            base_url="https://aminm-m4mihuzx-francecentral.cognitiveservices.azure.com",
-            api_key=GPT4_KEY
-        )
+        agent = create_agent_from_yaml("reporting_analyst",tools=None, max_iter=3)
         return agent
     @task
     def reporting_task(self) -> Task:

@@ -2,7 +2,8 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
 from config.logger import logger
 from services.clients.crew_client.crew_client_helpers import * 
-
+from crewai import LLM
+from config.keys import OPENAI_GPT4_KEY
 @CrewBase
 class TableMakerCrew():
     @before_kickoff
@@ -16,41 +17,17 @@ class TableMakerCrew():
         return result # You can return the result or modify it as needed
     
     @agent
-    def company_corporate_researcher(self) -> Agent:
-        return create_agent_from_yaml("company_corporate_researcher", [Tools["perplexity_search_tool"]])
-    
+    def compensation_career_culture_researcher(self) -> Agent:
+        return create_agent_from_yaml("compensation_career_culture_researcher", [Tools["perplexity_search_tool"]])
     @task
-    def company_corporate_research_task(self) -> Task:
+    def compensation_career_culture_researcher_task(self) -> Task:
         return Task(
-            config=tasks_config['company_corporate_research_task'],
-            description=tasks_config['company_corporate_research_task']['description'],
-            expected_output=tasks_config['company_corporate_research_task']['expected_output'],
-            agent=self.company_corporate_researcher()
+            config=tasks_config['compensation_career_culture_research_task'],
+            description=tasks_config['compensation_career_culture_research_task']['description'],
+            expected_output=tasks_config['compensation_career_culture_research_task']['expected_output'],
+            agent=self.compensation_career_culture_researcher()
         )
     
-    
-    @agent
-    def mission_vision_researcher(self) -> Agent:
-        return create_agent_from_yaml("mission_vision_researcher", [Tools["perplexity_search_tool"]])
-    @task
-    def mission_vision_researcher_task(self) -> Task:
-        return Task(
-            description=tasks_config['mission_vision_research_task']['description'],
-            expected_output=tasks_config['mission_vision_research_task']['expected_output'],
-            agent=self.mission_vision_researcher()
-        )
-    @agent
-    def financial_market_researcher(self) -> Agent:
-        return create_agent_from_yaml("financial_market_researcher", [Tools["perplexity_search_tool"]])
-
-    @task
-    def financial_market_researcher_task(self) -> Task:
-        return Task(
-            config=tasks_config['financial_market_research_task'],
-            description=tasks_config['financial_market_research_task']['description'],
-            expected_output=tasks_config['financial_market_research_task']['expected_output'],
-            agent=self.financial_market_researcher()
-        )
     @agent 
     def job_role_researcher(self) -> Agent:
         return create_agent_from_yaml("job_role_researcher", [Tools["perplexity_search_tool"]])
@@ -62,20 +39,17 @@ class TableMakerCrew():
             expected_output=tasks_config['job_role_research_task']['expected_output'],
             agent=self.job_role_researcher()
         )
+    
     @agent
-    def compensation_career_culture_researcher(self) -> Agent:
-        return create_agent_from_yaml("compensation_career_culture_researcher", [Tools["perplexity_search_tool"]])
+    def interview_preparation_researcher(self) -> Agent:
+        return create_agent_from_yaml("interview_preparation_researcher",tools=None)
     @task
-    def compensation_career_culture_researcher_task(self) -> Task:
-        return Task(
-            config=tasks_config['compensation_career_culture_research_task'],
-            description=tasks_config['compensation_career_culture_research_task']['description'],
-            expected_output=tasks_config['compensation_career_culture_research_task']['expected_output'],
-            agent=self.compensation_career_culture_researcher()
-        )
+    def interview_prep_task(self) -> Task:
+        return create_task_from_yaml("interview_prep_task", agent=self.interview_preparation_researcher())
+    
     @agent
     def reporting_analyst(self) -> Agent:
-        return create_agent_from_yaml("reporting_analyst")
+        return create_agent_from_yaml("reporting_analyst", tools=None, max_iter=3)
     @task
     def reporting_task(self) -> Task:
         return Task(
@@ -83,7 +57,12 @@ class TableMakerCrew():
             expected_output=tasks_config['reporting_task']['expected_output'],
             agent=self.reporting_analyst(),
             output_json=JobInformation,
+            context=[self.compensation_career_culture_researcher_task(), 
+                     self.job_role_researcher_task(),
+                     self.interview_prep_task()], # TODO: add context here
+            
         )
+    
     @crew
     def crew(self) -> Crew:
         """Creates the LatestAiDevelopment crew"""
@@ -91,6 +70,9 @@ class TableMakerCrew():
         return Crew(
             agents=self.agents, # Automatically created by the @agent decorator
             tasks=self.tasks, # Automatically created by the @task decorator
-            process=Process.sequential,
             verbose=True,
+            memory=True, 
+            planning=True,
+            manager_llm="azure/gpt-4o",
+            planning_llm="azure/gpt-4o"
         )

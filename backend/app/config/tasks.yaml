@@ -22,6 +22,7 @@ mission_vision_research_task:
     [CHAIN OF THOUGHT: Start by extracting the official mission and vision statements from the company's official resources. Then analyze press releases and interviews to understand the strategic goals and how they align with these statements. Next, compare the company's differentiation strategies and gather insights on its culture, CSR, and sustainability initiatives. DO NOT include these internal thoughts in your final output.]
 
     Research and compile detailed information about {company}'s mission, vision, and strategic goals.
+    website: reddit, yahoo, cnn, msbnc, blind, {company} website
     Gather insights on:
       - Official mission & vision statements.
       - Alignment of strategic goals with the mission.
@@ -52,7 +53,7 @@ financial_market_research_task:
 job_role_research_task:
   description: >
     [CHAIN OF THOUGHT: Begin by extracting the official job description for the {job} role from {company}'s career page. Supplement this with insights from employee reviews and third-party platforms. Break down the day-to-day responsibilities, required skills, and typical challenges. Additionally, document the interview process, including rounds, types of interviews, sample questions, and candidate experiences. DO NOT include these internal thoughts in your final output.]
-
+    websites: {company} website, workday, reddit, 
     Conduct in-depth research on the {job} role at {company}. Focus on:
       - Exact job title, department, and day-to-day responsibilities.
       - Core areas of focus and major tasks.
@@ -68,7 +69,7 @@ job_role_research_task:
 compensation_career_culture_research_task:
   description: >
     [CHAIN OF THOUGHT: Collect salary data and benefits information from reliable salary websites, employee reviews, and official sources. Compare compensation levels across different experience tiers. Also, gather data on career growth opportunities, internal mobility, and training programs. Finally, review employee feedback on work-life balance, DEI initiatives, and overall workplace satisfaction. DO NOT include these internal thoughts in your final output.]
-
+    websites: levels.fyi, reddit, yahoo, cnn, msbnc, blind, {company} website
     Research the compensation and career prospects for the {job} role at {company}, as well as the overall workplace culture. Focus on:
       - Salary ranges for junior, mid, and senior levels.
       - Benefits such as stock options, retirement plans, healthcare, and bonuses.
@@ -90,10 +91,10 @@ references_research_task:
   agent: references_researcher
 
 # Task 6: Interview Preparation Sources & References Aggregation
-interview_prep_references_task:
+interview_prep_task:
   description: >
-    [CHAIN OF THOUGHT: Review all outputs from previous interview‑prep tasks. Extract every cited interview experience, question, answer, preparation tip, and their URLs. Organize them into clear sections (Technical Questions, Behavioral Questions, Interview Format, Company Insights, Preparation Resources). DO NOT include these internal thoughts in your final output.]
-
+    [CHAIN OF THOUGHT: Search through reddit & blind for ways people prepared for the interview]
+    websites: reddit, blind , cnn, yahoo, msbnc
     Compile a structured, section‑by‑section bibliography of all sources used to prepare candidates for the {job} role at {company}.
   expected_output: >
     Provide a concise, 5‑bullet summary. Each bullet should name one section and list 2–3 direct URLs to credible sources for verification and deeper reading.
@@ -104,9 +105,7 @@ interview_prep_references_task:
 reporting_task:
   description: >
     Convert the **full** research report into a structured JSON format for automated job tracking.
-    ****
-    {research}
-    ****
+
     The JSON will be sent to our **Google Sheets API** for visualization and tracking. 
     Ensure that all details are captured **without any summarization or loss of information**.
     
