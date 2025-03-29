@@ -61,6 +61,5 @@ class TableMakerCrew():
             tasks=self.tasks, # Automatically created by the @task decorator
             verbose=True,
             planning=True,
-            manager_llm="azure/gpt-4o",
             planning_llm="azure/gpt-4o"
         )
