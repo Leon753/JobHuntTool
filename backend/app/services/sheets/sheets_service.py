@@ -6,7 +6,11 @@ from config.sheets_format import *
 from models.email_summary import Status
 from services.format.sheet_formater import SheetFormatter
 
-async def create_new_sheet_for_user(authorization: str, user_id: str, title: str = None) -> Tuple[str, int]:
+async def create_new_sheet_for_user(
+        authorization: str, 
+        user_id: str, 
+        title: str = None
+    ) -> Tuple[str, int]:
     """
     Creates a new Google Sheet for the user if none exists and returns (spreadsheet_id, start_row).
     
@@ -44,7 +48,13 @@ async def create_new_sheet_for_user(authorization: str, user_id: str, title: str
     return excel_id, start_row
 
 
-async def update_google_sheets_row(authorization: str, user_id: str, excel_id:str, row:int, row_values: list) -> None:
+async def update_google_sheets_row(
+        authorization: str, 
+        user_id: str, 
+        excel_id:str, 
+        row:int, 
+        row_values: list
+    ) -> None:
     """
     Updates the user's Google Sheet with the provided row data.
     
@@ -73,15 +83,27 @@ async def update_google_sheets_row(authorization: str, user_id: str, excel_id:st
     await update_sheet(authorization, sheets_data, excel_id)
 
 
-async def apply_new_sheet_formatting(authorization: str,spreadsheet_id: str, sheet_id:int = 0):
+async def apply_new_sheet_formatting(
+        authorization: str,
+        spreadsheet_id: str, 
+        sheet_id:int = 0
+    ) -> None:
+
     formatter = SheetFormatter(sheet_id)
     batch_update_json = (
         formatter
         .clear_format() # Clear existing formatting to start fresh
-        .set_header_format(0, TABLE_SIZE_COLUMN, {"red": 0.7176, "green": 0.8824, "blue": 0.8039, "alpha": 1.0})  # Set header format
-        .auto_resize(0, TABLE_SIZE_COLUMN)
+        .set_header_format(
+            0, 
+            TABLE_SIZE_COLUMN, 
+            {"red": 0.7176, "green": 0.8824, "blue": 0.8039, "alpha": 1.0}
+        )  # Set header format
+        .auto_resize(
+            0, 
+            TABLE_SIZE_COLUMN
+        )
         .add_conditional_format_rule(
-            condition_value=str(Status.OFFER.name),  # e.g. "interviewing"
+            condition_value=str(Status.OFFER.value),  # e.g. "interviewing"
             background_color={"red": 0.0, "green": 0.7, "blue": 0.0, "alpha": 1.0}, # Light gray for offer
             start_row=1,
             end_row=TABLE_SIZE_ROW,
@@ -90,7 +112,7 @@ async def apply_new_sheet_formatting(authorization: str,spreadsheet_id: str, she
             index=0
         )
         .add_conditional_format_rule(
-            condition_value=str(Status.REJECTED.name),  # e.g. "interviewing"
+            condition_value=str(Status.REJECTED.value),  # e.g. "interviewing"
             background_color={"red": 1.0, "green": 0.0, "blue": 0.0, "alpha": 1.0},
             start_row=1,
             end_row=TABLE_SIZE_ROW,
@@ -108,9 +130,15 @@ async def apply_new_sheet_formatting(authorization: str,spreadsheet_id: str, she
         )
         .build()  
     )
-    await update_sheet_format(authorization,batch_update_json,spreadsheet_id)
+    await update_sheet_format(authorization,
+                              batch_update_json,
+                              spreadsheet_id)
 
-async def auto_resize_wrap_columns(authorization: str, spreadsheet_id: str, sheet_id:int = 0):
+async def auto_resize_wrap_columns(
+        authorization: str, 
+        spreadsheet_id: str, 
+        sheet_id:int = 0
+    ) -> None:
     """
     Auto-resizes the columns of the Google Sheet to fit their content.
     
@@ -122,16 +150,36 @@ async def auto_resize_wrap_columns(authorization: str, spreadsheet_id: str, shee
     Returns:
         None
     """
-    print
+
     formatter = SheetFormatter(sheet_id)
     batch_update_json = (
         formatter
-        .auto_resize(0, TABLE_SIZE_COLUMN)
-        .wrap_text(
+        .set_column_width(
+            0, 
+            HEADER_NAMES.index("STATUS")+1,  # Set width for all columns up to JOB_DESCRIPTION
+            pixel_size=85
+        )
+        .set_column_width(
+            HEADER_NAMES.index("JOB_DESCRIPTION"),  # Set width for the JOB_DESCRIPTION column
+            TABLE_SIZE_COLUMN,  # Set width for all columns after JOB_DESCRIPTION
+            pixel_size=500 # Wider width for job description to accommodate more text
+        )
+        .wrap_and_allign_text(
+            start_row=1, 
+            end_row=TABLE_SIZE_ROW,
+            start_col=0, 
+            end_col=HEADER_NAMES.index("STATUS")+1,  
+            vertical_alignment="MIDDLE",  
+            horizontal_alignment="CENTER", 
+            font_size=12
+        )
+        .wrap_and_allign_text(
             start_row=1,  # Start from the first row after the header
             end_row=TABLE_SIZE_ROW,  # End at the last row of the table
-            start_col=0,  # Start from the first column
-            end_col=TABLE_SIZE_COLUMN  # End at the last column
+            start_col=HEADER_NAMES.index("JOB_DESCRIPTION"),  # Start from the first column
+            end_col=TABLE_SIZE_COLUMN,
+            vertical_alignment="TOP", 
+            font_size=12
         )  # Resize all columns in the sheet
         .build()
     )

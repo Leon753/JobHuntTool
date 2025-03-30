@@ -34,7 +34,7 @@ def extract_row_values(response:JobInformation, summary_json:GPT_Email_Summary_R
     row_values = [
         summary_json.company,           
         summary_json.job_position,      
-        str(summary_json.status.name),  
+        str(summary_json.status.value),  
         content_strings["job_description"],
         content_strings["pay_range"],
         content_strings["interview_process"],

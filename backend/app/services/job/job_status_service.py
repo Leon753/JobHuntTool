@@ -63,8 +63,8 @@ async def handle_in_review_or_interview(
     )
 
     # 5) Apply formatting to the sheet
-    if row == 2:  # Only apply formatting if this is the first row of data
-        await sheets_service.auto_resize_wrap_columns(authorization, excel_id)
+    #if row == 2:  # Only apply formatting if this is the first row of data
+    await sheets_service.auto_resize_wrap_columns(authorization, excel_id)
 
 
 async def handle_offer_or_rejection(
@@ -82,12 +82,13 @@ async def handle_offer_or_rejection(
         company=summary_json.company,
         position=summary_json.job_position
     )
+  
     # Update just the status column
     await sheets_service.update_status_column(
         authorization,
         user_id,
         excel_id,
         row,
-        [str(summary_json.status.name)]
+        [str(summary_json.status.value)]
     )
     return "UPDATE DATABASE"
