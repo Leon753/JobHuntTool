@@ -2,20 +2,9 @@ from services.user.user_service import get_user_excel_from_db, save_user_info_to
 from services.clients.google_client.sheets_client import create_sheet, update_sheet, update_sheet_format
 from typing import Dict, Tuple
 from config.logger import logger
-from config.sheets_format import sheet_format_json
-
-HEADER_COLUMNS = ["A","B","C","D","E","F","G","H","I"]
-HEADER_NAMES = [
-    "COMPANY",
-    "POSITION",
-    "STATUS",
-    "JOB_DESCRIPTION",
-    "PAY_RANGE",
-    "INTERVIEW_PROCESS",
-    "EXAMPLE_INTERVIEW_EXPERIENCE",
-    "CAREER_GROWTH",
-    "EXAMPLE_TECHNICAL_QUESTIONS"
-]
+from config.sheets_format import *
+from models.email_summary import Status
+from services.format.sheet_formater import SheetFormatter
 
 async def create_new_sheet_for_user(authorization: str, user_id: str, title: str = None) -> Tuple[str, int]:
     """
@@ -84,9 +73,69 @@ async def update_google_sheets_row(authorization: str, user_id: str, excel_id:st
     await update_sheet(authorization, sheets_data, excel_id)
 
 
-async def apply_sheet_formatting(authorization: str,spreadsheet_id: str, sheet_id:int = 0):
-    await update_sheet_format(authorization,sheet_format_json,spreadsheet_id)
+async def apply_new_sheet_formatting(authorization: str,spreadsheet_id: str, sheet_id:int = 0):
+    formatter = SheetFormatter(sheet_id)
+    batch_update_json = (
+        formatter
+        .clear_format() # Clear existing formatting to start fresh
+        .set_header_format(0, TABLE_SIZE_COLUMN, {"red": 0.7176, "green": 0.8824, "blue": 0.8039, "alpha": 1.0})  # Set header format
+        .auto_resize(0, TABLE_SIZE_COLUMN)
+        .add_conditional_format_rule(
+            condition_value=str(Status.OFFER.name),  # e.g. "interviewing"
+            background_color={"red": 0.0, "green": 0.7, "blue": 0.0, "alpha": 1.0}, # Light gray for offer
+            start_row=1,
+            end_row=TABLE_SIZE_ROW,
+            start_col=HEADER_NAMES.index("STATUS"),  # Assuming "Status" is the column for status
+            end_col=HEADER_NAMES.index("STATUS") + 1,  # End column is exclusive, so +1
+            index=0
+        )
+        .add_conditional_format_rule(
+            condition_value=str(Status.REJECTED.name),  # e.g. "interviewing"
+            background_color={"red": 1.0, "green": 0.0, "blue": 0.0, "alpha": 1.0},
+            start_row=1,
+            end_row=TABLE_SIZE_ROW,
+            start_col=HEADER_NAMES.index("STATUS"),     # Assuming "Status" is the column for status
+            end_col=HEADER_NAMES.index("STATUS") + 1,   # End column is exclusive, so +1
+            index=0
+        ) # Clear any existing banded rows to avoid conflicts
+        .add_banded_rows(
+            start_row=1,  # Start from the first row after the header
+            end_row=TABLE_SIZE_ROW,  # End at the last row of the table
+            start_col=0,  # Start from the first column
+            end_col=TABLE_SIZE_COLUMN,  # End at the last column
+            first_band_color={"red": 0.95, "green": 0.95, "blue": 0.95, "alpha":1.0},  # Light gray for banded rows
+            second_band_color={"red": 1.0, "green": 1.0, "blue": 1.0, "alpha":1.0},  # White for alternating rows
+        )
+        .build()  
+    )
+    await update_sheet_format(authorization,batch_update_json,spreadsheet_id)
 
+async def auto_resize_wrap_columns(authorization: str, spreadsheet_id: str, sheet_id:int = 0):
+    """
+    Auto-resizes the columns of the Google Sheet to fit their content.
+    
+    Args:
+        authorization (str): Bearer token for Google Sheets.
+        spreadsheet_id (str): The ID of the spreadsheet to update.
+        sheet_id (int): The ID of the sheet to apply formatting to. Defaults to 0.
+        
+    Returns:
+        None
+    """
+    print
+    formatter = SheetFormatter(sheet_id)
+    batch_update_json = (
+        formatter
+        .auto_resize(0, TABLE_SIZE_COLUMN)
+        .wrap_text(
+            start_row=1,  # Start from the first row after the header
+            end_row=TABLE_SIZE_ROW,  # End at the last row of the table
+            start_col=0,  # Start from the first column
+            end_col=TABLE_SIZE_COLUMN  # End at the last column
+        )  # Resize all columns in the sheet
+        .build()
+    )
+    await update_sheet_format(authorization, batch_update_json, spreadsheet_id)
 
 async def update_status_column(authorization: str, user_id: str, excel_id:str, row:int, row_value: list):
     sheets_data = {

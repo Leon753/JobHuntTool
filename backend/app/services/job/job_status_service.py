@@ -6,7 +6,9 @@ from services.sheets import sheets_service
 from services.user import user_service
 from utils.helpers import extract_row_values
 from services.job import job_info_service
-
+from services.format.sheet_formater import SheetFormatter
+from config.sheets_format import *
+from models.email_summary import Status
 async def handle_in_review_or_interview(
     summary_json: GPT_Email_Summary_Response,
     user_id: str,
@@ -30,8 +32,9 @@ async def handle_in_review_or_interview(
             current_sheet_row=start_row,
             excel_id=excel_id
         )
-        # Optionally apply formatting
-        await sheets_service.apply_sheet_formatting(authorization, excel_id)
+        # Apply formatting to the new sheet
+        await sheets_service.apply_new_sheet_formatting(authorization, excel_id)
+
         row = start_row
     else:
         row = user_service_response["current_sheet_row"]
@@ -50,9 +53,7 @@ async def handle_in_review_or_interview(
     # 4) Update DB to reflect the new row usage
     await user_service.update_user_row(user_id=user_id, current_sheet_row=row+1)
 
-    # 5) (Optional) re-apply formatting each time, if needed
-    await sheets_service.apply_sheet_formatting(authorization, excel_id)
-
+    
     # 6) Save job & sheet row reference in DB
     await user_service.save_excel_job_row_to_db(
         user_id=user_id,
@@ -60,6 +61,11 @@ async def handle_in_review_or_interview(
         position=summary_json.job_position,
         sheet_row=row
     )
+
+    # 5) Apply formatting to the sheet
+    if row == 2:  # Only apply formatting if this is the first row of data
+        await sheets_service.auto_resize_wrap_columns(authorization, excel_id)
+
 
 async def handle_offer_or_rejection(
     summary_json: GPT_Email_Summary_Response,
