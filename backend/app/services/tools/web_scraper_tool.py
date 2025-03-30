@@ -39,7 +39,7 @@ class WebScrapperTool(BaseTool):
     description: str = "A tool to use gpt-4o to extract information from a list of urls"
     args_schema: Type[BaseModel] = MyToolInput
     
-    def _run(self, urls: str) -> str:
+    def _run(self, urls: List[str]) -> str:
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
         driver = webdriver.Chrome(options=options)
@@ -61,3 +61,8 @@ class WebScrapperTool(BaseTool):
 
         extracted_content = extract(content=website_contents)
         return extracted_content
+    
+if __name__ == "__main__":
+    url = "https://block.xyz/careers/jobs/4408046008"
+    scrapper = WebScrapperTool()
+    print(scrapper._run([url])) 

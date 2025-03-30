@@ -1,4 +1,5 @@
 import json
+from services.tools.web_scraper_tool import WebScrapperTool
 from models.create_table import JobInformation
 from fastapi import APIRouter, HTTPException, Header, Body
 from services.clients.perplexity_client import PerplexityClient 
@@ -126,3 +127,17 @@ async def get_company_job_info( email_id: str = Body(...), authorization: str = 
         case _:
             raise HTTPException(status_code=500, detail="Response validation failed")
         
+@router.post("/company-job-url-crew-ai")
+async def get_company_job_url(user_id: str = Body(...), job_post_url: str = Body(...), authorization: str = Header(...)):
+    logger.info("INFO CREW AI CALLED")
+
+    scraper = WebScrapperTool()
+    
+    # Get job posting content
+    scraped_response = scraper._run([job_post_url])
+    # Use job posting content as the "email"
+    summary_json: GPT_Email_Summary_Response = await email_summary_service.email_summary(scraped_response)
+
+    # Assume the user is in the Interviewing phase
+    await job_status_service.handle_in_review_or_interview(summary_json,user_id, authorization)
+    return {"message": "Job info successfully updated"}

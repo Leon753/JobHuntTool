@@ -1,36 +1,11 @@
 import { Button } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
-import { getAuthToken, getUserEmail } from "../chrome/utils";
-import { useEffect, useState } from "react";
-
-const getUserInfo = async () => {
-    const userEmail = await getUserEmail();
-    const token = await getAuthToken();
-    const userInfo = await fetch(
-        `http://127.0.0.1:8080/user/get-user-excel?user_id=${userEmail}`,
-        {
-            method: "GET",
-            headers: {
-                "Content-Type": 'application/json',
-                "Authorization": `Bearer ${token}`
-            },
-        }
-    );
-
-    const userObject = await userInfo.json();
-    console.log("excelSheetId", userObject.excel_id);
-    return userObject.excel_id;
-}
+import { useRootContext } from "../context/RootContext";
 
 function Overview() {
-  const [spreadSheetUrl, setSpreadSheetUrl] = useState<string | null>();
 
-  useEffect(() => {
-    getUserInfo().then((res) => {
-        setSpreadSheetUrl(res);
-    })
-  }, [])
+  const userInfo = useRootContext();
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 w-full">
@@ -50,8 +25,8 @@ function Overview() {
 
         {/* Button that links to job spreadsheet */}
         <div className="flex flex-col items-start gap-2">
-        {spreadSheetUrl && 
-            <a href={`https://docs.google.com/spreadsheets/d/${spreadSheetUrl}/edit?gid=0#gid=0`} 
+        {userInfo && 
+            <a href={`https://docs.google.com/spreadsheets/d/${userInfo.excel_id}/edit?gid=0#gid=0`} 
             target="_blank"
             
             >
