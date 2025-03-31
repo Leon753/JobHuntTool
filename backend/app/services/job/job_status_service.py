@@ -6,9 +6,7 @@ from services.sheets import sheets_service
 from services.user import user_service
 from utils.helpers import extract_row_values
 from services.job import job_info_service
-from services.format.sheet_formater import SheetFormatter
-from config.sheets_format import *
-from models.email_summary import Status
+
 async def handle_in_review_or_interview(
     summary_json: GPT_Email_Summary_Response,
     user_id: str,
@@ -63,8 +61,8 @@ async def handle_in_review_or_interview(
     )
 
     # 5) Apply formatting to the sheet
-    #if row == 2:  # Only apply formatting if this is the first row of data
-    await sheets_service.auto_resize_wrap_columns(authorization, excel_id)
+    if row == 2:  # Only apply formatting if this is the first row of data
+        await sheets_service.auto_resize_wrap_columns(authorization, excel_id)
 
 
 async def handle_offer_or_rejection(
