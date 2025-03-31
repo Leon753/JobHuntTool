@@ -3,7 +3,7 @@ from enum import Enum
 
 class Status(Enum):
     IN_REVIEW = "InReview"
-    INTERVIEWING = "Interviewing"
+    INTERVIEWING = "Interview"
     OFFER = "Offer"
     REJECTED = "Rejected"
 
