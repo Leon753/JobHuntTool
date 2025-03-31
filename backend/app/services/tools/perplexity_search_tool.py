@@ -10,7 +10,7 @@ class PerplexitySearchTool(BaseTool):
 
     def _run(self, query: str) -> str:
         vector_db.create_vector_db()
-        result = vector_db.similarity_search(query)
+        result, citations = vector_db.similarity_search(query)
         if result is None:
             # Example endpoint; replace with the actual Perplexity API endpoint if available.
             headers = {
@@ -33,7 +33,9 @@ class PerplexitySearchTool(BaseTool):
             ] 
             prelixty_client = PerplexityClient(api_key=PERPLEXITY_API_KEY, 
                                         api_url="https://api.perplexity.ai/chat/completions", 
-                                        model="sonar")
-            result = prelixty_client.get_response_sync(messages=messages)
-            vector_db.add_message(query, result)
-        return result
+                                        model="sonar-pro")
+            result, citations = prelixty_client.get_response_sync(messages=messages)
+           
+            
+            vector_db.add_message(query, result,  citations)
+        return result, citations 

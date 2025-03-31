@@ -25,10 +25,14 @@ class ColumnResult(BaseModel):
     content: List[str]
     source: List[str]
 
+class PayRange_ColumnResult(BaseModel):
+    status: str
+    content: List[Dict[str, str]]
+    source: List[str]
 
 class Columns(BaseModel):
     job_description: ColumnResult
-    pay_range: ColumnResult
+    pay_range: PayRange_ColumnResult
     interview_process: ColumnResult
     example_interview_experience: ColumnResult
     career_growth: ColumnResult

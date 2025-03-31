@@ -37,7 +37,7 @@ class PerplexityClient:
             response = requests.post(self.api_url, headers=headers, json=payload, timeout=timeout)
             response.raise_for_status()
             json_response = response.json()
-            return json_response["choices"][0]["message"]["content"]
+            return json_response["choices"][0]["message"]["content"], json_response["citations"]
         except requests.Timeout:
             logger.error(f"⏳ API request timed out after %d seconds{timeout}" )
             return None
