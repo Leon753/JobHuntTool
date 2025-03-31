@@ -37,7 +37,12 @@ class SheetFormatter:
         return self
 
     def set_header_format(
-        self, start_col, end_col, background_color, font_size=12, bold=True
+        self, 
+        start_col, 
+        end_col, 
+        background_color, 
+        font_size=12, 
+        bold=True
     ) -> "SheetFormatter":
 
         self.requests.append(
@@ -65,7 +70,12 @@ class SheetFormatter:
         return self
 
     def update_borders(
-        self, start_row, end_row, start_col, end_col, border_color
+        self, 
+        start_row, 
+        end_row, 
+        start_col, 
+        end_col, 
+        border_color
     ) -> "SheetFormatter":
 
         self.requests.append(
