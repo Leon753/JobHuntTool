@@ -1,7 +1,8 @@
 # JobHuntTool
 Automated Job Tracker to help you get your next job. 
 
-<img width="1704" alt="image" src="https://github.com/user-attachments/assets/6a5c7736-b8c4-4dc1-bede-81b96e94346b" />
+<img width="1710" alt="image" src="https://github.com/user-attachments/assets/9919b852-cdef-450d-9b0a-1f010919624f" />
+
 
 # Project Setup Instructions
 
