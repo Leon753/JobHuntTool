@@ -1,23 +1,23 @@
 import { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
+import { UserInfo } from '../helpers/types';
 
-const RootContext = createContext(false);
+const RootContext = createContext<UserInfo | undefined>(undefined);
 
 interface Props {
     children: ReactNode
-    value: boolean
+    userInfo: UserInfo | undefined
 }
 
-export function RootProvider({ children, value }: Props) {
+export function RootProvider({ children, userInfo }: Props) {
 
   return (
-    <RootContext.Provider value={value}>
+    <RootContext.Provider value={userInfo}>
       {children}
     </RootContext.Provider>
   );
-
 }
 
-export function useRootContext(): boolean {
+export function useRootContext(): UserInfo | undefined {
     return useContext(RootContext);
 }

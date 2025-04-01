@@ -1,12 +1,7 @@
-export type EmailPartBody = {
-    data: String
-    size: Number
-}
-
-export type EmailPart = {
-    partId: String
-    mimeType: String
-    fileName: String
-    headers: any
-    body: EmailPartBody
+export type UserInfo = {
+    id: number
+    current_sheet_row: number
+    excel_id: string
+    updated_at: string
+    user_id: string
 }

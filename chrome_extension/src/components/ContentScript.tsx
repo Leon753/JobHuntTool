@@ -60,7 +60,7 @@ const createButton = () => {
 
   // Add text container
   const textSpan = document.createElement('span');
-  textSpan.textContent = 'Fetch Email Summary';
+  textSpan.textContent = 'Extract Job Details';
   
   // Add elements to button
   button.appendChild(spinner);
