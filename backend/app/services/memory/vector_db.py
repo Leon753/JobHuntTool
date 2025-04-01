@@ -4,6 +4,7 @@ from langchain_chroma import Chroma  # Using the dedicated chroma package
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.schema import Document
 from config.logger import logger
+import json 
 
 SIMILARITY_THRESHOLD = 0.80
 EMBEDDING_MODEL = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -22,8 +23,8 @@ def create_vector_db():
         return
     logger.info("Chroma DB already exists")
 
-def add_message(query: str, result):
-    new_doc = Document(page_content=query, metadata={"answer": result})
+def add_message(query: str, result, citations):
+    new_doc = Document(page_content=query, metadata={"answer": result, "citations": json.dumps(citations)})
     # Load the persistent collection using the constructor.
     db = Chroma(
         persist_directory=PERSIST_DIRECTORY,
@@ -48,9 +49,11 @@ def similarity_search(query):
             if similarity >= SIMILARITY_THRESHOLD:
                 strict_results.append((doc, similarity))
         if len(strict_results) != 1:
-            return None
+            return None, None
         else:
-            return strict_results[0][0].metadata
+            results = strict_results[0][0].metadata
+            results['citations'] = json.loads(results['citations']) if 'citations' in results else []
+            return results
     except Exception as e:
         logger.info(f"Error in Similarity Search: {e}")
         raise

@@ -23,7 +23,12 @@ def get_columns_content_strings(columns: Columns) -> dict[str, str]:
         # TODO: THIS IS A BUG
         if len(content_list) == 0:
             logger.warning("THERE IS AN EMPTY OUTPUT FROM REPORTING AGENT: MEANING THE SECTION WILL BE EMPTY")
-            result[column_name] = [" "]
+            result[column_name] = " " 
+            continue
+        if column_name == "pay_range":
+            # For pay_range, we need to format it differently.
+            formatted = [f"*{item['position']}: {item['salary']}" for item in content_list]
+            result[column_name] = "\n".join(formatted) 
             continue
         content_list[0] = "*" + content_list[0]
         result[column_name] = "\n*".join(content_list)

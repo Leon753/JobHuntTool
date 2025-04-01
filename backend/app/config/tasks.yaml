@@ -124,8 +124,9 @@ reporting_task:
                     }},
                     "pay_range": {{
                         "status": "<Validated|Needs Work|Incorrect>",
-                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Full salary details including stock options, benefits, and bonuses
+                        "content": [{"position": <postion string>, "salary": "salary range string"}],  # Full salary details including stock options, benefits, and bonuses
                         "source": ["<url1>", "<url2>", ...]
+                        ""
                     }},
                     "interview_process": {{
                         "status": "<Validated|Needs Work|Incorrect>",
