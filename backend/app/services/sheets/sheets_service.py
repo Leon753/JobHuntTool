@@ -1,4 +1,4 @@
-from services.user.user_service import get_user_excel_from_db, save_user_info_to_db, update_user_row
+from services.user.user_service import save_user_info_to_db
 from services.clients.google_client.sheets_client import create_sheet, update_sheet, update_sheet_format
 from typing import Dict, Tuple
 from config.logger import logger
@@ -41,9 +41,12 @@ async def create_new_sheet_for_user(
         }]
     }
     await update_sheet(authorization, header_data, excel_id)
+    await apply_new_sheet_formatting(authorization, excel_id)
+    await auto_resize_wrap_columns(authorization, excel_id)
 
     # 3) Record spreadsheet ID in your DB
     start_row = 2  # We'll start adding data from row 2
+    await save_user_info_to_db(user_id, start_row, excel_id)
 
     return excel_id, start_row
 

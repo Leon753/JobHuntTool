@@ -19,7 +19,7 @@ def extract(content: List[str]) -> str:
     messages = [
             {
                 "role": "system", 
-                "content": "You are an assistant. who is reading scraped data from a list of website urls and extracting information", 
+                "content": "You are an assistant. who is reading scraped data from a list of website urls and extracting information. Return back the only text context and do not summarize.", 
             },
             {
                 "role": "user", 
@@ -39,7 +39,7 @@ class WebScrapperTool(BaseTool):
     description: str = "A tool to use gpt-4o to extract information from a list of urls"
     args_schema: Type[BaseModel] = MyToolInput
     
-    def _run(self, urls: str) -> str:
+    def _run(self, urls: List[str]) -> str:
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
         driver = webdriver.Chrome(options=options)

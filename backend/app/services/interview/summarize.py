@@ -1,6 +1,7 @@
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+from config.logger import logger
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -62,5 +63,5 @@ def summarize_job_details(job_details: str) -> str:
         summary = response.choices[0].message.content.strip()
         return summary
     except Exception as e:
-        print("Error summarizing job details:", e)
+        logger.error("Error summarizing job details:", e)
         return "Error generating job description summary."

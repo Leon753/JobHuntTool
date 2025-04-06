@@ -50,7 +50,7 @@ class TableMakerCrew():
                                         self.job_role_researcher_task(),
                                         self.interview_prep_task()]
                                     )
-
+    
     @crew
     def crew(self) -> Crew:
         """Creates the LatestAiDevelopment crew"""
