@@ -25,7 +25,8 @@ function Overview() {
 
         {/* Button that links to job spreadsheet */}
         <div className="flex flex-col items-start gap-2">
-        {userInfo && 
+        {userInfo &&
+          <>
             <a href={`https://docs.google.com/spreadsheets/d/${userInfo.excel_id}/edit?gid=0#gid=0`} 
             target="_blank"
             
@@ -38,10 +39,11 @@ function Overview() {
                     <span>Go to my Job Sheet</span>
                 </Button>
             </a>
+            <span className="flex text-sm text-gray-500 italic">
+                This will create a new Job Sheet if you haven't logged in before.
+            </span>
+          </> 
         }
-        <span className="flex text-sm text-gray-500 italic">
-            This will create a new Job Sheet if you haven't logged in before.
-        </span>
         </div>
       </div>
     </div>

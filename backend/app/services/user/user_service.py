@@ -30,9 +30,7 @@ async def get_user_excel_from_db(user_id: str):
             if row is None:
                 return None
             return row
-        
 
-        
 async def delete_user_info_from_db(user_id: str) -> bool:
     async with aiosqlite.connect(DATABASE) as db:
         async with db.execute("DELETE FROM users WHERE user_id = ?", (user_id,)) as cursor:

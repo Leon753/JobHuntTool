@@ -1,3 +1,4 @@
+from config.logger import logger
 from services.sheets.sheets_service import create_new_sheet_for_user
 from fastapi import APIRouter, HTTPException, Request
 from models.user import UserAndExcelId
@@ -19,8 +20,7 @@ async def get_user_excel(req: Request, user_id: str):
     result = await get_user_excel_from_db(user_id)
     if result is None:
         # if no excel sheet found. Create one for the user and set this up.
-        excel_id, start_row = await create_new_sheet_for_user(req.headers.get("authorization"), user_id, "JobHunter")
-        await save_user_info_to_db(user_id, start_row, excel_id)
+        excel_id, start_row = await create_new_sheet_for_user(req.headers.get("authorization"), user_id, "JOBHUNT")
         return {"current_sheet_row": start_row, "excel_id": excel_id, "user_id": user_id}
     
     return result

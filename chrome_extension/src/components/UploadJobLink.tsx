@@ -35,7 +35,7 @@ function UploadJobLink() {
         e.preventDefault();
         console.log('Submitted:', inputValue);
         if (userInfo) {
-          submitURL(inputValue, userInfo.excel_id);
+          submitURL(inputValue, userInfo.user_id);
         } else {
           console.log('User info invalid; Skipping');
         }

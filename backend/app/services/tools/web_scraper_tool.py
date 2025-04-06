@@ -19,7 +19,7 @@ def extract(content: List[str]) -> str:
     messages = [
             {
                 "role": "system", 
-                "content": "You are an assistant. who is reading scraped data from a list of website urls and extracting information", 
+                "content": "You are an assistant. who is reading scraped data from a list of website urls and extracting information. Return back the only text context and do not summarize.", 
             },
             {
                 "role": "user", 
@@ -61,8 +61,3 @@ class WebScrapperTool(BaseTool):
 
         extracted_content = extract(content=website_contents)
         return extracted_content
-    
-if __name__ == "__main__":
-    url = "https://block.xyz/careers/jobs/4408046008"
-    scrapper = WebScrapperTool()
-    print(scrapper._run([url])) 

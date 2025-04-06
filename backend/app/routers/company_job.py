@@ -1,4 +1,5 @@
 import json
+from services.job import job_url_service
 from services.tools.web_scraper_tool import WebScrapperTool
 from models.create_table import JobInformation
 from fastapi import APIRouter, HTTPException, Header, Body
@@ -44,10 +45,7 @@ async def get_company_job_info( email_id: str = Body(...), authorization: str = 
 async def get_company_job_url(user_id: str = Body(...), job_post_url: str = Body(...), authorization: str = Header(...)):
     logger.info("INFO CREW AI CALLED")
 
-    scraper = WebScrapperTool()
-    
-    # Get job posting content
-    scraped_response = scraper._run([job_post_url])
+    scraped_response = job_url_service.get_job_link_info(job_post_url)
     # Use job posting content as the "email"
     summary_json: GPT_Email_Summary_Response = await email_summary_service.email_summary(scraped_response)
 
