@@ -6,7 +6,6 @@ import Overview from './Overview';
 import UploadResume from './UploadResume';
 import UploadJobLink from './UploadJobLink';
 
-
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -21,14 +20,16 @@ function App() {
       case 'overview':
         return <Overview />;
       case 'upload_resume':
-        return (<UploadResume />);
+        return <UploadResume />;
       case 'upload_job_link':
-        return (<UploadJobLink />);
+        return <UploadJobLink />;
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
+    <div className="min-h-screen bg-gray-50 w-full relative">
       {/* Tab Navigation */}
       <div className="flex border-b">
         {tabs.map((tab) => {

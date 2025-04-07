@@ -7,11 +7,6 @@ from crewai.crews import CrewOutput
 import asyncio
 from services.clients.crew_client.agents.table_agent import TableMakerCrew
 
-
-
-
-        
-
 async def crewai_table(query_key:str, inputs:dict):
     try:
         table_maker_instance = TableMakerCrew()

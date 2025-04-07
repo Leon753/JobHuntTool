@@ -15,7 +15,7 @@ def generate_interview_question(resume_summary: str, job_description: str) -> st
     """
     prompt = (
         "Given the following candidate resume summary and job description, "
-        "generate a behavioral interview question that evaluates the candidate's fit for the job.\n\n"
+        "generate 5 technical interview question that evaluates the candidate's fit for the job.\n\n"
         "Candidate Resume Summary:\n"
         f"{resume_summary}\n\n"
         "Job Description:\n"

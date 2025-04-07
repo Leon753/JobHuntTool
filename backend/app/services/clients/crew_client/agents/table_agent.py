@@ -32,7 +32,7 @@ class TableMakerCrew():
     
     @agent
     def interview_preparation_researcher(self) -> Agent:
-        return create_agent_from_yaml("interview_preparation_researcher",tools=None)
+        return create_agent_from_yaml("interview_preparation_researcher", [Tools["interview_preparation_tool"]])
     @task
     def interview_prep_task(self) -> Task:
         return create_task_from_yaml("interview_prep_task", agent=self.interview_preparation_researcher())
@@ -42,7 +42,7 @@ class TableMakerCrew():
         return create_agent_from_yaml("reporting_analyst", tools=None, max_iter=3)
     @task
     def reporting_task(self) -> Task:
-        return create_task_from_yaml("interview_reporting_taskprep_task",
+        return create_task_from_yaml("reporting_task",
                                      agent=self.reporting_analyst(),
                                      output_json=JobInformation,
                                      context=[
@@ -50,8 +50,6 @@ class TableMakerCrew():
                                         self.job_role_researcher_task(),
                                         self.interview_prep_task()]
                                     )
-    @agent
-    
     @crew
     def crew(self) -> Crew:
         """Creates the LatestAiDevelopment crew"""

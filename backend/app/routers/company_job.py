@@ -26,6 +26,8 @@ async def get_company_job_info( email_id: str = Body(...), authorization: str = 
     email_response = await email_service.get_email(authorization, email_id)
     user_id = email_response['payload']['headers'][0]['value']
     summary_json: GPT_Email_Summary_Response = await email_service.get_email_summary(email_response)
+
+    # Get resume summary
     
     # Step 2: Process job application based on status using match-case
     match(summary_json.status): 

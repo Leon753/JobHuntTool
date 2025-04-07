@@ -37,4 +37,13 @@ async def init_db():
             """
 
         )
+        await db.execute(
+            """ 
+                CREATE TABLE IF NOT EXISTS resumes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                filename TEXT,
+                resume_text TEXT
+            )
+            """
+        )       
         await db.commit()
