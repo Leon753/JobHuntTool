@@ -2,7 +2,7 @@ from crewai.tools.base_tool import BaseTool
 from services.clients.perplexity_client import PerplexityClient
 from config.keys import PERPLEXITY_API_KEY
 from services.memory import vector_db
-
+from config.logger import logger
 
 class PerplexitySearchTool(BaseTool):
     name: str = "Perplexity Search Tool"
@@ -11,6 +11,11 @@ class PerplexitySearchTool(BaseTool):
     def _run(self, query: str) -> str:
         vector_db.create_vector_db()
         result, citations = vector_db.similarity_search(query)
+        if result is not None:
+            # If we have a cached result, return it
+            logger.info("+++++Found cached result in vector DB")
+   
+            
         if result is None:
             # Example endpoint; replace with the actual Perplexity API endpoint if available.
             headers = {

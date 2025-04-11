@@ -1,12 +1,18 @@
 SHEET_ID = 0 
 TABLE_SIZE_ROW = 100
-TABLE_SIZE_COLUMN = 9
+
 HEADER_ROW = 1
-HEADER_COLUMNS = ["A","B","C","D","E","F","G","H","I"]
+HEADER_COLUMNS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"]
+TABLE_SIZE_COLUMN = len(HEADER_COLUMNS) 
 HEADER_NAMES = [
     "COMPANY",
-    "POSITION",
+    "JOB_POSITION",
+    "DATE_APPLIED",
     "STATUS",
+    "INDUSTRY",
+    "LOCATION",
+    "SCORE",
+    "YEARS_OF_EXPERIENCE",
     "JOB_DESCRIPTION",
     "PAY_RANGE",
     "INTERVIEW_PROCESS",
