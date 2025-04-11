@@ -95,7 +95,7 @@ interview_prep_task:
   description: >
     [CHAIN OF THOUGHT: Search through reddit & blind for ways people prepared for the interview]
     websites: reddit, blind , cnn, yahoo, msbnc
-    Compile a structured, section‑by‑section bibliography of all sources used to prepare candidates for the {job} role at {company}.
+    Use the user's resume information as context {resume}, compile a structured, section‑by‑section bibliography of all sources used to prepare candidates for the {job} role at {company}.
   expected_output: >
     Provide a concise, 5‑bullet summary. Each bullet should name one section and list 2–3 direct URLs to credible sources for verification and deeper reading.
   agent: interview_preparation_researcher

@@ -15,7 +15,7 @@ class TableMakerCrew():
     def after_kickoff_function(self, result):
         logger.info(f"After kickoff function with result: {result}")
         return result # You can return the result or modify it as needed
-    
+
     @agent
     def compensation_career_culture_researcher(self) -> Agent:
         return create_agent_from_yaml("compensation_career_culture_researcher", [Tools["perplexity_search_tool"]])
@@ -32,11 +32,11 @@ class TableMakerCrew():
     
     @agent
     def interview_preparation_researcher(self) -> Agent:
-        return create_agent_from_yaml("interview_preparation_researcher", [Tools["interview_preparation_tool"]])
+        return create_agent_from_yaml("interview_preparation_researcher", tools=None)
     @task
     def interview_prep_task(self) -> Task:
         return create_task_from_yaml("interview_prep_task", agent=self.interview_preparation_researcher())
-    
+
     @agent
     def reporting_analyst(self) -> Agent:
         return create_agent_from_yaml("reporting_analyst", tools=None, max_iter=3)
@@ -50,6 +50,7 @@ class TableMakerCrew():
                                         self.job_role_researcher_task(),
                                         self.interview_prep_task()]
                                     )
+
     @crew
     def crew(self) -> Crew:
         """Creates the LatestAiDevelopment crew"""

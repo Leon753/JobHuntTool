@@ -79,3 +79,10 @@ async def does_excel_job_exist(user_id: str, company: str, position: str) -> boo
             exists_value = await cursor.fetchone()
             # The EXISTS function returns 1 if the row exists, 0 otherwise.
             return bool(exists_value[0])
+
+async def get_resume_from_db(user_id: str):
+    async with aiosqlite.connect(DATABASE) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute("SELECT * FROM resumes WHERE user_id = ?", (user_id,)) as cursor:
+            row = await cursor.fetchone()
+            return row["resume_text"] if row else ""

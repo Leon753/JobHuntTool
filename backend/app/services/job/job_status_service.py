@@ -14,7 +14,8 @@ async def handle_in_review_or_interview(
 ) -> None:
     query_key = summary_json.company + summary_json.job_position
     # 1) Get or create job info (from memo or CrewAI)
-    response: JobInformation = await job_info_service.get_or_create_job_info(query_key, summary_json)
+    resume = await user_service.get_resume_from_db(user_id=user_id)
+    response: JobInformation = await job_info_service.get_or_create_job_info(query_key, summary_json, resume)
 
     # 2) Check if user has an existing sheet
     user_service_response = await user_service.get_user_excel_from_db(user_id=user_id)

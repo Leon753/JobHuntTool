@@ -41,6 +41,7 @@ async def init_db():
             """ 
                 CREATE TABLE IF NOT EXISTS resumes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT NOT NULL,
                 filename TEXT,
                 resume_text TEXT
             )
