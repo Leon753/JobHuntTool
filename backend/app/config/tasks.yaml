@@ -116,6 +116,10 @@ reporting_task:
 
             {{
                 "company": "{company}",
+                "industry": "<industry string>",
+                "location": "<location string>",
+                "score": <score string>, # provide score on job match 0-100
+                
                 "results": {{
                     "job_description": {{
                         "status": "<Validated|Needs Work|Incorrect>",
@@ -124,12 +128,13 @@ reporting_task:
                     }},
                     "pay_range": {{
                         "status": "<Validated|Needs Work|Incorrect>",
-                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Full salary details including stock options, benefits, and bonuses
+                        "content": [{"position": <postion string>, "salary": "salary range string"}],  # Keep this as concise as possible
                         "source": ["<url1>", "<url2>", ...]
+                        ""
                     }},
                     "interview_process": {{
                         "status": "<Validated|Needs Work|Incorrect>",
-                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Detailed breakdown of the interview process, number of rounds, types of questions asked
+                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Detailed breakdown of the interview process, number of rounds do not include type of questions 
                         "source": ["<url1>", "<url2>", ...]
                     }},
                     "example_interview_experience": {{
@@ -147,6 +152,11 @@ reporting_task:
                         "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Full LeetCode/system design questions as found, without summarization
                         "source": ["<url1>", "<url2>", ...]
                     }}
+                    "years_of_experience": {{
+                        "status": "<Validated|Needs Work|Incorrect>",
+                        "content": ["<bullet1>", "<bullet2>", "<bullet3>", ...],  # Years of experience required for the role keep it very short
+                        "source": ["<url1>", "<url2>", ...]
+                    }},
                 }}
             }}
   agent: reporting_analyst

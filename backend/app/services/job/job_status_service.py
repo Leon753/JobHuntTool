@@ -62,7 +62,8 @@ async def handle_in_review_or_interview(
 
     # 5) Apply formatting to the sheet
     if row == 2:  # Only apply formatting if this is the first row of data
-        await sheets_service.auto_resize_wrap_columns(authorization, excel_id)
+        pass
+    await sheets_service.auto_resize_wrap_columns(authorization, excel_id)
 
 
 async def handle_offer_or_rejection(

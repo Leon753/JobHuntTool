@@ -1,13 +1,11 @@
-from pydantic import BaseModel
-from models.email_summary import Status
+from services.builders.sheets.base.sheet_format_base import SheetFormatterBase
 
-
-class SheetFormatter:
+class GoogleSheetFormatter(SheetFormatterBase):
     def __init__(self, sheet_id):
         self.sheet_id = sheet_id
         self.requests = []
 
-    def clear_format(self) -> "SheetFormatter":
+    def clear_format(self) -> "GoogleSheetFormatter":
         self.requests.append(
             {
                 "updateCells": {
@@ -20,7 +18,7 @@ class SheetFormatter:
         )
         return self
 
-    def auto_resize(self, start_index, end_index) -> "SheetFormatter":
+    def auto_resize(self, start_index, end_index) -> "GoogleSheetFormatter":
 
         self.requests.append(
             {
@@ -43,7 +41,7 @@ class SheetFormatter:
         background_color, 
         font_size=12, 
         bold=True
-    ) -> "SheetFormatter":
+    ) -> "GoogleSheetFormatter":
 
         self.requests.append(
             {
@@ -76,7 +74,7 @@ class SheetFormatter:
         start_col, 
         end_col, 
         border_color
-    ) -> "SheetFormatter":
+    ) -> "GoogleSheetFormatter":
 
         self.requests.append(
             {
@@ -107,7 +105,7 @@ class SheetFormatter:
         )
         return self
 
-    def freeze_row(self, frozen_row_count) -> "SheetFormatter":
+    def freeze_row(self, frozen_row_count) -> "GoogleSheetFormatter":
         self.requests.append(
             {
                 "updateSheetProperties": {
@@ -130,7 +128,7 @@ class SheetFormatter:
         background_color: dict = None,
         background_color_style: dict = None,
         theme_color: str = None,
-    ) -> "SheetFormatter":
+    ) -> "GoogleSheetFormatter":
         """
         Sets the background color for the specified range.
 
@@ -174,7 +172,7 @@ class SheetFormatter:
         end_col: int,
         condition_type: str = "TEXT_EQ",
         index: int = 0,
-    ) -> "SheetFormatter":
+    ) -> "GoogleSheetFormatter":
         """
         Adds a conditional formatting rule.
 
@@ -226,7 +224,7 @@ class SheetFormatter:
         first_band_color: dict,
         second_band_color: dict,
         header_color: dict = None,
-    ) -> "SheetFormatter":
+    ) -> "GoogleSheetFormatter":
         """
         Applies alternating row colors (banding) for the specified range.
         Optionally sets a header color for the first row of the banded range.
@@ -266,7 +264,7 @@ class SheetFormatter:
         )
         return self
 
-    def deleted_banded_rows(self) -> "SheetFormatter":
+    def deleted_banded_rows(self) -> "GoogleSheetFormatter":
         self.requests.append(
             {
                 "deleteBanding": {  # Removes the banded range with the given ID from the spreadsheet. # Removes a banded range
@@ -285,7 +283,7 @@ class SheetFormatter:
         vertical_alignment: str = "MIDDLE",
         horizontal_alignment: str = "LEFT",
         font_size: int = 10,
-    ) -> "SheetFormatter":
+    ) -> "GoogleSheetFormatter":
         self.requests.append(
             {
                 "repeatCell": {
@@ -312,7 +310,7 @@ class SheetFormatter:
 
     def set_column_width(
         self, start_index: int, end_index: int, pixel_size: int = 400
-    ) -> "SheetFormatter":
+    ) -> "GoogleSheetFormatter":
         self.requests.append(
             {
                 "updateDimensionProperties": {
@@ -336,7 +334,7 @@ class SheetFormatter:
         start_col: int,
         end_col: int,
         font_size: int = 10,
-    ) -> "SheetFormatter":
+    ) -> "GoogleSheetFormatter":
         self.requests.append(
             {
                 "repeatCell": {

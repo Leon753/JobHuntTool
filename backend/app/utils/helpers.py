@@ -3,6 +3,7 @@ import re
 from models.create_table import Columns , JobInformation
 from models.email_summary import GPT_Email_Summary_Response
 from config.logger import logger
+from datetime import datetime
 def string_to_json(response):
     cleaned = re.sub(r"^```json\s*", "", response)
     cleaned = re.sub(r"\s*```$", "", cleaned)
@@ -23,7 +24,12 @@ def get_columns_content_strings(columns: Columns) -> dict[str, str]:
         # TODO: THIS IS A BUG
         if len(content_list) == 0:
             logger.warning("THERE IS AN EMPTY OUTPUT FROM REPORTING AGENT: MEANING THE SECTION WILL BE EMPTY")
-            result[column_name] = [" "]
+            result[column_name] = " " 
+            continue
+        if column_name == "pay_range":
+            # For pay_range, we need to format it differently.
+            formatted = [f"*{item['position']}: {item['salary']}" for item in content_list]
+            result[column_name] = "\n".join(formatted) 
             continue
         content_list[0] = "*" + content_list[0]
         result[column_name] = "\n*".join(content_list)
@@ -31,16 +37,23 @@ def get_columns_content_strings(columns: Columns) -> dict[str, str]:
 
 def extract_row_values(response:JobInformation, summary_json:GPT_Email_Summary_Response) -> list:
     content_strings = get_columns_content_strings(response.results) 
+    # Get today's date and format it as 'YYYY-MM-DD'
     row_values = [
         summary_json.company,           
-        summary_json.job_position,      
+        summary_json.job_position, 
+        datetime.today().strftime('%Y-%m-%d'),
         str(summary_json.status.value),  
+        response.industry,
+        response.location,
+        response.score,
+        content_strings["years_of_experience"],
         content_strings["job_description"],
         content_strings["pay_range"],
         content_strings["interview_process"],
         content_strings["example_interview_experience"],
         content_strings["career_growth"],
         content_strings["example_technical_questions"],
+        
     ]
     return row_values
 
